@@ -1,0 +1,48 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <util.hpp>
+#include <rei.hpp>
+
+int main(int argc, char* argv[]) {
+
+    // -----------------
+    // Reading the input
+    // -----------------
+
+    if (argc != 8) {
+        printf("Arguments should be in the form of\n");
+        printf("-----------------------------------------------------------------\n");
+        printf("%s <file_address> <c1> <c2> <c3> <c4> <c5> <max_cost>\n", argv[0]);
+        printf("-----------------------------------------------------------------\n");
+        printf("\nFor example\n");
+        printf("-----------------------------------------------------------------\n");
+        printf("%s ./input 1 12 60 1 1 1 1 1 1 500\n", argv[0]);
+        printf("-----------------------------------------------------------------\n");
+        return 0;
+    }
+
+    bool argError = false;
+    for (int i = 2; i < argc; ++i) {
+        if (std::atoi(argv[i]) <= 0 || std::atoi(argv[i]) > SHRT_MAX) {
+            printf("Argument number %d, \"%s\", should be a positive short integer.\n", i, argv[i]);
+            argError = true;
+        }
+    }
+    if (argError) return 0;
+
+    std::string fileName = argv[1];
+    std::vector<std::string> pos, neg;
+    if (!rei::readFile(fileName, pos, neg)) return 0;
+
+    unsigned short costFun[5];
+    for (int i = 0; i < 5; i++)
+        costFun[i] = std::atoi(argv[i + 2]);
+    unsigned short maxCost = std::atoi(argv[7]);
+
+    auto res = rei::Run(costFun, maxCost, pos, neg, 60 * 60 * 60);
+
+    printf("\n\nRE: \"%s\"\n", res.RE.c_str());
+
+    return 0;
+}
