@@ -4,6 +4,8 @@
 #include <util.hpp>
 #include <rei.hpp>
 
+#include <regex_match.hpp>
+
 int main(int argc, char* argv[]) {
 
     // -----------------
@@ -41,6 +43,24 @@ int main(int argc, char* argv[]) {
     unsigned short maxCost = std::atoi(argv[7]);
 
     auto res = rei::Run(costFun, maxCost, pos, neg, 60 * 60 * 60);
+
+    for (auto p : pos)
+    {
+        if (!match(res.RE, p))
+        {
+            printf("regex didn't match %s\n",p.c_str());
+            break;
+        }
+    }
+
+    for (auto n : neg)
+    {
+        if (match(res.RE, n))
+        {
+            printf("regex did match %s\n",n.c_str());
+            break;
+        }
+    }
 
     printf("\n\nRE: \"%s\"\n", res.RE.c_str());
 

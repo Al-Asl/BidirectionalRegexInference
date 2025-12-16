@@ -175,6 +175,28 @@ public:
         return nt;
     }
 
+    bool checkAllVisited(int& sIdx) {
+        for (size_t idx = 0; idx < lastIdx; idx+=2)
+        {
+            auto ls = nodeStatus[idx];
+            auto rs = nodeStatus[idx + 1];
+
+            auto lsolved = ls > 0 && idxToCS.find(ls) != idxToCS.end();
+            auto rsolved = rs > 0 && idxToCS.find(rs) != idxToCS.end();
+
+            if (!lsolved || !rsolved) continue;
+
+            isFound = recursiveCheck(parentIdx[idx], idx);
+
+            if (isFound)
+            {
+                sIdx = idx;
+                return true;
+            }
+        }
+        return false;
+    }
+
     bool recursiveCheck(int index, int lcIdx)
     {
         // we can reconstruct the cs recursively, we don't need cache
@@ -198,7 +220,7 @@ public:
         if (pIdx < 0) // the solved set parents is -1
             return true;
 
-        return recursiveCheck(pIdx, index > sIdx ? index : sIdx);
+        return recursiveCheck(pIdx, index < sIdx ? index : sIdx);
     }
 
     int getOutmostParent(int index) {
@@ -366,6 +388,10 @@ rei::Result rei::Run(const unsigned short* costFun, const unsigned short maxCost
 
     if (context.intialCheck(alphabets.size(), pos, RE)) return Result(RE, 0, /*context.allREs*/ 0, guideTable.ICsize);
 
+    // the index 0 and 1 are reserved for checking
+    partitioner.start(0, Operation::Question) = 2;
+    context.lastIdx = 2;
+
     // generate the solution set and fill the first level
     {
         auto solutionSet = context.addSolutionSet(guideTable.ICsize, posBits, negBits);
@@ -451,12 +477,22 @@ rei::Result rei::Run(const unsigned short* costFun, const unsigned short maxCost
         LOG_OP(0, to_string(Operation::Or), context.allPairs, context.counter);
     }
 
+    int solvedIndex;
     int level;
     for (level = 1; level < maxLevel; level++)
     {
+        {
+            auto [start, end] = partitioner.Interval(level - 1);
+            if (end - start < 1) {
+                int sIdx;
+                context.checkAllVisited(solvedIndex);
+                goto exitEnumeration;
+            }
+        }
+
         // Question
         {
-            auto [start, end] = partitioner.Interval(level);
+            auto [start, end] = partitioner.Interval(level - 1);
 
             for (int parentIdx = start; parentIdx < end; parentIdx++)
             {
@@ -468,6 +504,7 @@ rei::Result rei::Run(const unsigned short* costFun, const unsigned short maxCost
                     if (context.insertAndCheck(parentIdx, parent & (~CS::one())))
                     {
                         LOG_OP(level, to_string(Operation::Question), context.allPairs, context.counter);
+                        solvedIndex = context.lastIdx - 1;
                         partitioner.end(level, Operation::Question) = INT_MAX; goto exitEnumeration;
                     }
                 }
@@ -494,6 +531,7 @@ rei::Result rei::Run(const unsigned short* costFun, const unsigned short maxCost
                         if (context.insertAndCheck(parentIdx, childs[i]))
                         {
                             LOG_OP(level, to_string(Operation::Star), context.allPairs, context.counter);
+                            solvedIndex = context.lastIdx - 1;
                             partitioner.end(level, Operation::Star) = INT_MAX; goto exitEnumeration;
                         }
                     }
@@ -521,6 +559,7 @@ rei::Result rei::Run(const unsigned short* costFun, const unsigned short maxCost
                     if (context.insertAndCheck(parentIdx, pair.left, pair.right))
                     {
                         LOG_OP(level, to_string(Operation::Concatenate), context.allPairs, context.counter);
+                        solvedIndex = context.lastIdx - 1;
                         partitioner.end(level, Operation::Concatenate) = INT_MAX; goto exitEnumeration;
                     }
                 }
@@ -545,6 +584,7 @@ rei::Result rei::Run(const unsigned short* costFun, const unsigned short maxCost
                     if (context.insertAndCheck(parentIdx, pair.left, pair.right))
                     {
                         LOG_OP(level, to_string(Operation::Or), context.allPairs, context.counter);
+                        solvedIndex = context.lastIdx - 1;
                         partitioner.end(level, Operation::Or) = INT_MAX; goto exitEnumeration;
                     }
                 }
@@ -558,7 +598,7 @@ exitEnumeration:
 
     if (context.isFound)
     {
-        int rootIdx = context.getOutmostParent(context.lastIdx - 1);
+        int rootIdx = context.getOutmostParent(solvedIndex);
         RE = context.constructDownward(rootIdx % 2 == 0 ? rootIdx : rootIdx - 1, partitioner);
         return Result(RE, level, context.allPairs, guideTable.ICsize);
     }
