@@ -86,18 +86,10 @@ namespace rei
             for (int i = 0; i < guideTable.ICsize; i++)
             {
                 auto c = processStar(guideTable, CS::one() << i);
-
-                auto it = std::find_if(data.begin(), data.end(), [c](std::vector<CS> vec) {
-                    return (vec[0] & c) == c;
-                    });
-
-                if (it == data.end())
-                    data.push_back(std::vector<CS>({ c }));
-                else
-                    (*it).push_back(c);
+                data.push_back(c);
             }
         }
-        std::vector<std::vector<CS>> data;
+        std::vector<CS> data;
     };
 
     std::vector<CS> invertQuestion(const CS& cs) {
@@ -132,7 +124,7 @@ namespace rei
 
         for (int i = 0; i < starLookup.data.size(); i++)
         {
-            auto rcs = starLookup.data[i][0];
+            auto rcs = starLookup.data[i];
             if ((cs & rcs) == rcs)
                 candidates.push_back({ rcs, i });
         }
