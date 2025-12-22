@@ -6,7 +6,7 @@
 
 #include <regex_match.hpp>
 
-int main(int argc, char* argv[]) {
+int main(int argc, const char* argv[]) {
 
     // -----------------
     // Reading the input
@@ -49,7 +49,6 @@ int main(int argc, char* argv[]) {
         if (!match(res.RE, p))
         {
             printf("regex didn't match %s\n",p.c_str());
-            break;
         }
     }
 
@@ -58,7 +57,6 @@ int main(int argc, char* argv[]) {
         if (match(res.RE, n))
         {
             printf("regex did match %s\n",n.c_str());
-            break;
         }
     }
 

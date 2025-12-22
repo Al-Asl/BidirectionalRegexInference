@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.24)
 
-project(RegexInference LANGUAGES CXX CUDA)
+project(Top-Down LANGUAGES CXX CUDA)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 function(define_enum_option VAR_NAME DEFAULT_VALUE DESCRIPTION VALUES INDEX)
@@ -45,6 +45,7 @@ include/operations.h
 include/top_down.hpp
 include/rei.hpp
 include/level_partitioner.h
+include/regex_match.hpp
 )
 
 set(SOURCES
@@ -52,6 +53,7 @@ src/main.cpp
 src/util.cpp 
 src/top_down.cpp
 src/rei.cpp
+src/regex_match.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

@@ -1,5 +1,6 @@
 #include "rei.hpp"
 
+#include <span>
 #include <queue>
 #include <unordered_set>
 #include <unordered_map>
@@ -12,9 +13,9 @@
 using Operation = rei::Operation;
 using LevelPartitioner = rei::LevelPartitioner;
 
-#define LOG_OP(level, op_string, allpairs, counter) \
-        printf("Level %-2d | (%s) | AllPairs: %-11lu | S %-5d | NV %-11lu | V %-11lu | VSS %-11lu | SR %-5d | G %-5d \n", \
-            level, op_string.c_str() ,allpairs,  counter.solved, counter.notVisited, counter.visited, counter.visitedSolutionSet, counter.solvedReused, counter.given);
+#define LOG_OP(levelnum, op_string, allpairs, counter) \
+        printf("Level %-2d | (%s) | AllPairs: %-11llu | S %-5llu | NV %-11llu | V %-11llu | C %-11llu | SS %-5llu | G %-5llu \n", \
+            levelnum, op_string.c_str() ,allpairs,  counter.solved, counter.notVisited, counter.visited, counter.cyclic, counter.selfSolved, counter.given);
 
 class CSResolverInterface {
 public:
@@ -23,22 +24,51 @@ public:
 
 class Context {
 public:
+    enum class NodeType
+    {
+        NotVistied  = 0,
+        Cyclic      = 1,
+        Vistied     = 2,
+        SelfSolved  = 3, // Solved by this graph
+        Given       = 4,
+    };
+
     struct Counter {
+
         uint64_t solved;
         uint64_t notVisited;
         uint64_t visited;
-        uint64_t visitedSolutionSet;
-        uint64_t solvedReused;
+        uint64_t cyclic;
+        uint64_t selfSolved;
         uint64_t given;
+
+        void update(const NodeType& nt) {
+            switch (nt) {
+            case NodeType::NotVistied:
+                notVisited++;
+                break;
+            case NodeType::Cyclic:
+                cyclic++;
+                break;
+            case NodeType::Vistied:
+                visited++;
+                break;
+            case NodeType::SelfSolved:
+                selfSolved++;
+                break;
+            case NodeType::Given:
+                given++;
+                break;
+            }
+        }
     };
 
     Context(int cache_capacity, CSResolverInterface* resolver)
         : cache_capacity(cache_capacity), resolver(resolver) {
 
-        leftChildIdx = new int[2 * (cache_capacity + 1)];
-        nodeStatus = new int[cache_capacity + 1];
-        parentIdx = new int[cache_capacity + 1];
-        cache = new CS[cache_capacity + 1];
+        status = new int[cache_capacity + 2];
+        parentIdx = new int[cache_capacity + 2];
+        cache = new CS[cache_capacity + 2];
         lastIdx = 0;
         isFound = false;
         allPairs = 0;
@@ -47,9 +77,8 @@ public:
 
     ~Context() {
         delete[] cache;
-        delete[] leftChildIdx;
         delete[] parentIdx;
-        delete[] nodeStatus;
+        delete[] status;
     }
 
     bool intialCheck(int alphabetsSize, const std::vector<std::string>& pos, std::string& RE)
@@ -60,7 +89,7 @@ public:
 
         if ((pos.size() == 1) && (pos.at(0).empty())) { RE = "eps"; return true; }
         visited[CS::one()] = -1;
-        solved.insert(CS::one()); // int(CS of empty) is 1
+        solved.insert(CS::one());
 
         // Checking the alphabets
 
@@ -129,64 +158,64 @@ public:
         return solutionSet;
     }
 
-    enum class NodeType
+    NodeType getNodeType(const CS& cs)
     {
-        NotVistied  = 0,
-        Vistied     = 1,
-        Solved      = 2,
-    };
-
-    NodeType insert(CS cs, int pIdx)
-    {
-        NodeType nt;
-
-        if (visited.find(cs) == visited.end())
+        auto vit = visited.find(cs);
+        if (vit == visited.end())
+            return NodeType::NotVistied;
+        if (solved.find(cs) == solved.end())
         {
-            counter.notVisited++;
-            cache[lastIdx] = cs;
-            visited[cs] = lastIdx;
-            nodeStatus[lastIdx] = 0;
-            nt = NodeType::NotVistied;
-        }
-        else if (solved.find(cs) == solved.end()) 
-        {
-            // to ignore the solved set
-            if (visited.at(cs) > -1)
-            {
-                nodeStatus[lastIdx] = visited.at(cs);
-                counter.visited++;
-            }else
-                counter.visitedSolutionSet++;
-            nt = NodeType::Vistied;
+            if ((*vit).second == -1) // we only test the solution set
+                return NodeType::Cyclic;
+            else
+                return NodeType::Vistied;
         }
         else
         {
-            if (visited.at(cs) == -1)
-                counter.given++;
+            if ((*vit).second == -1)
+                return NodeType::Given;
             else
-                counter.solvedReused++;
+                return NodeType::SelfSolved;
+        }
+    }
 
-            nodeStatus[lastIdx] = visited.at(cs);
-            idxToCS[lastIdx] = cs;
-            nt = NodeType::Solved;
+    void insert(NodeType nodeType,CS cs, int pIdx)
+    {
+        switch (nodeType) {
+        case NodeType::NotVistied:
+            cache[lastIdx] = cs;
+            visited[cs] = lastIdx;
+            status[lastIdx] = 0;
+            break;
+        case NodeType::Vistied:
+            status[lastIdx] = - visited.at(cs);
+            break;
+        case NodeType::SelfSolved:
+            status[lastIdx] = - visited.at(cs);
+            idxToSolved[lastIdx] = cs;
+            break;
+        case NodeType::Given:
+            status[lastIdx] = -1;
+            idxToSolved[lastIdx] = cs;
+            break;
         }
 
         parentIdx[lastIdx++]  = pIdx;
-        return nt;
+    }
+
+    bool isSolved(int idx) {
+        auto s = status[idx];
+        if (s == -1 || s > 1) return true;
+        if (s < -1) return idxToSolved.find(-s) != idxToSolved.end();
+        return false;
     }
 
     bool checkAllVisited(int& sIdx) {
-        for (size_t idx = 0; idx < lastIdx; idx+=2)
+        for (size_t idx = 2; idx < lastIdx; idx += 2)
         {
-            auto ls = nodeStatus[idx];
-            auto rs = nodeStatus[idx + 1];
+            if (!isSolved(idx) || !isSolved(idx + 1)) continue;
 
-            auto lsolved = ls > 0 && idxToCS.find(ls) != idxToCS.end();
-            auto rsolved = rs > 0 && idxToCS.find(rs) != idxToCS.end();
-
-            if (!lsolved || !rsolved) continue;
-
-            isFound = recursiveCheck(parentIdx[idx], idx);
+            isFound = parentIdx[idx] == -1 ? true : recursiveCheck(parentIdx[idx], idx);
 
             if (isFound)
             {
@@ -199,23 +228,19 @@ public:
 
     bool recursiveCheck(int index, int lcIdx)
     {
+        //if (isSolved(index)) return false;
+
         // we can reconstruct the cs recursively, we don't need cache
         solved.insert(cache[index]);
-        leftChildIdx[index] = lcIdx;
-        idxToCS[index] = cache[index];
+        status[index]       = lcIdx;
+        idxToSolved[index]  = cache[index];
+
         counter.solved++;
 
         int pIdx = parentIdx[index];
-
         int sIdx = index % 2 == 0 ? index + 1 : index - 1;
 
-        // check if the sibling is solved
-        int sStatus = nodeStatus[sIdx];
-        bool sSolved = sStatus == -1;
-        if (sStatus > 0)
-            sSolved = idxToCS.find(sStatus) != idxToCS.end();
-
-        if (!sSolved) return false;
+        if (!isSolved(sIdx)) return false;
 
         if (pIdx < 0) // the solved set parents is -1
             return true;
@@ -243,12 +268,12 @@ public:
     std::string constructDownward(int index, const LevelPartitioner& partioner) 
     {
         std::string left;
-        if (nodeStatus[index] == -1)
-            left = resolver->resolve(idxToCS.at(index));
+        if (status[index] == -1)
+            left = resolver->resolve(idxToSolved.at(index));
         else
         {
-            auto lIdx = nodeStatus[index] == 0 ? index : nodeStatus[index];
-            left = constructDownward(leftChildIdx[lIdx], partioner);
+            auto ls = status[index];
+            left = constructDownward(ls < -1 ? status[-ls] : ls, partioner);
         }
 
         int level;
@@ -272,12 +297,12 @@ public:
         }
 
         std::string right;
-        if (nodeStatus[++index] == -1)
-            right = resolver->resolve(idxToCS.at(index));
+        if (status[++index] == -1)
+            right = resolver->resolve(idxToSolved.at(index));
         else
         {
-            auto rIdx = nodeStatus[index] == 0 ? index : nodeStatus[index];
-            right = constructDownward(leftChildIdx[rIdx], partioner);
+            auto rs = status[index];
+            right = constructDownward(rs < -1 ? status[-rs] : rs, partioner);
         }
 
         if (op == Operation::Concatenate)
@@ -293,18 +318,29 @@ public:
 
     bool insertAndCheck(int parentIdx, CS left, CS right)
     {
+        if (lastIdx == cache_capacity + 2) return true;
+
         allPairs++;
 
-        auto lt = insert(left, parentIdx);
-        auto rt = insert(right, parentIdx);
+        auto lt = getNodeType(left);
+        auto rt = getNodeType(right);
 
-        if ((static_cast<int>(lt) >= 2) && (static_cast<int>(rt) >= 2))
+        counter.update(lt);
+        counter.update(rt);
+
+        if (lt == NodeType::Cyclic || rt == NodeType::Cyclic)
+            return false;
+
+        insert(lt, left, parentIdx);
+        insert(rt, right, parentIdx);
+
+        if ((static_cast<int>(lt) > 2) && (static_cast<int>(rt) > 2))
         {
             isFound = recursiveCheck(parentIdx, lastIdx - 2);
             return isFound;
         }
 
-        if ((static_cast<int>(lt) >= 1) && (static_cast<int>(rt) >= 1))
+        if ((static_cast<int>(lt) > 1) || (static_cast<int>(rt) > 1))
         {
             // need to handle this case somehow
             // need to be stored for later checks!
@@ -314,23 +350,22 @@ public:
     }
 
     bool insertAndCheck(int parentIdx, CS child)
-    {
+    {     
         return insertAndCheck(parentIdx, child, CS::one());
     }
 
     int cache_capacity;
-    int* leftChildIdx;
     int* parentIdx;
-    int* nodeStatus;
-
+    int* status; // 0 = the original node, -1 = given, < -1 = redirectIdx, > 1 = leftIdx
     CS* cache;
+
     std::unordered_map<CS, int> visited;
     std::unordered_set<CS> solved;
-    std::unordered_map<int, CS> idxToCS;
+    std::unordered_map<int, CS> idxToSolved;
     CSResolverInterface* resolver;
 
     Counter counter;
-    unsigned long allPairs;
+    uint64_t allPairs;
     // Index of the last free position in the language cache
     int lastIdx;
     bool isFound;
@@ -364,6 +399,105 @@ std::set<char> findAlphabets(const std::vector<std::string>& pos, const std::vec
     return alphabet;
 }
 
+std::pair<bool,int> processLevel(Context& context, LevelPartitioner& partitioner, 
+    const rei::GuideTable& guideTable, const rei::StarLookup& starLookup, 
+    std::span<CS> level, int levelnum, int startPIdx, bool overrideParent = false, int opIdx = 0) {
+
+    // Question
+    int pIdx = startPIdx - 1;
+    for (const auto& parent : level)
+    {
+        pIdx++;
+        if (parent == CS()) continue;
+
+        if (parent & CS::one())
+        {
+            if (context.insertAndCheck(overrideParent ? opIdx : pIdx, parent & (~CS::one())))
+            {
+                LOG_OP(levelnum, to_string(Operation::Question), context.allPairs, context.counter);
+                partitioner.end(levelnum, Operation::Question) = INT_MAX;
+                return { true, context.lastIdx - 1 };
+            }
+        }
+    }
+    partitioner.end(levelnum, Operation::Question) = context.lastIdx;
+    LOG_OP(levelnum, to_string(Operation::Question), context.allPairs, context.counter);
+
+    // Star
+    pIdx = startPIdx - 1;
+    for (const auto& parent : level)
+    {
+        pIdx++;
+        if (parent == CS()) continue;
+
+        if (parent & CS::one())
+        {
+            auto childs = rei::invertStar(parent, starLookup);
+
+            for (size_t i = 0; i < childs.size(); i++)
+            {
+                if (context.insertAndCheck(overrideParent ? opIdx : pIdx, childs[i]))
+                {
+                    LOG_OP(levelnum, to_string(Operation::Star), context.allPairs, context.counter);
+                    partitioner.end(levelnum, Operation::Star) = INT_MAX;
+                    return { true, context.lastIdx - 1 };
+                }
+            }
+        }
+    }
+    partitioner.end(levelnum, Operation::Star) = context.lastIdx;
+    LOG_OP(levelnum, to_string(Operation::Star), context.allPairs, context.counter);
+
+    // Concatenate
+    pIdx = startPIdx - 1;
+    for (const auto& parent : level)
+    {
+        pIdx++;
+        if (parent == CS()) continue;
+
+        auto pairs = invertConcat(parent, guideTable);
+
+        for (size_t i = 0; i < pairs.size(); i++)
+        {
+            auto pair = pairs[i];
+
+            if (context.insertAndCheck(overrideParent ? opIdx : pIdx, pair.left, pair.right))
+            {
+                LOG_OP(levelnum, to_string(Operation::Concatenate), context.allPairs, context.counter);
+                partitioner.end(levelnum, Operation::Concatenate) = INT_MAX;
+                return { true, context.lastIdx - 1 };
+            }
+        }
+    }
+    partitioner.end(levelnum, Operation::Concatenate) = context.lastIdx;
+    LOG_OP(levelnum, to_string(Operation::Concatenate), context.allPairs, context.counter);
+
+    // Or
+    pIdx = startPIdx - 1;
+    for (const auto& parent : level)
+    {
+        pIdx++;
+        if (parent == CS()) continue;
+
+        auto pairs = invertOr(parent);
+
+        for (size_t i = 0; i < pairs.size(); i++)
+        {
+            auto pair = pairs[i];
+            if (context.insertAndCheck(overrideParent ? opIdx : pIdx, pair.left, pair.right))
+            {
+                LOG_OP(levelnum, to_string(Operation::Or), context.allPairs, context.counter);
+                partitioner.end(levelnum, Operation::Or) = INT_MAX;
+                return { true, context.lastIdx - 1 };
+            }
+        }
+    }
+    partitioner.end(levelnum, Operation::Or) = context.lastIdx;
+    LOG_OP(levelnum, to_string(Operation::Or), context.allPairs, context.counter);
+
+    return { false, 0 };
+}
+
 rei::Result rei::Run(const unsigned short* costFun, const unsigned short maxCost, 
     const std::vector<std::string>& pos, const std::vector<std::string>& neg, double maxTime)
 {
@@ -392,97 +526,27 @@ rei::Result rei::Run(const unsigned short* costFun, const unsigned short maxCost
     partitioner.start(0, Operation::Question) = 2;
     context.lastIdx = 2;
 
+    int solvedIndex;
+    int level = 0;
+
     // generate the solution set and fill the first level
     {
         auto solutionSet = context.addSolutionSet(guideTable.ICsize, posBits, negBits);
 
-        // Question
-        {
-            for (const auto& parent : solutionSet)
-            {
+        auto res = processLevel(context, partitioner, guideTable, starLookup, 
+                    std::span(solutionSet), level++, 2, true, -1);
 
-                if (parent & CS::one())
-                {
-                    if (context.insertAndCheck(-1, parent & (~CS::one())))
-                    {
-                        LOG_OP(0, to_string(Operation::Question), context.allPairs, context.counter);
-                        partitioner.end(0, Operation::Question) = INT_MAX; goto exitEnumeration;
-                    }
-                }
-            }
+        if (res.first) {
+            solvedIndex = res.second;
+            goto exitEnumeration;
         }
-        partitioner.end(0, Operation::Question) = context.lastIdx;
-        LOG_OP(0, to_string(Operation::Question), context.allPairs, context.counter);
-
-        // Star
-        {
-            for (const auto& parent : solutionSet)
-            {
-                if (parent & CS::one())
-                {
-                    auto childs = rei::invertStar(parent, starLookup);
-
-                    for (size_t i = 0; i < childs.size(); i++)
-                    {
-                        if (context.insertAndCheck(-1, childs[i]))
-                        {
-                            LOG_OP(0, to_string(Operation::Star), context.allPairs, context.counter);
-                            partitioner.end(0, Operation::Star) = INT_MAX; goto exitEnumeration;
-                        }
-                    }
-                }
-            }
-        }
-        partitioner.end(0, Operation::Star) = context.lastIdx;
-        LOG_OP(0, to_string(Operation::Star), context.allPairs, context.counter);
-
-        // Concatenate
-        {
-            for (const auto& parent : solutionSet)
-            {
-                auto pairs = invertConcat(parent, guideTable);
-
-                for (size_t k = 0; k < pairs.size(); k++)
-                {
-                    auto pair = pairs[k];
-                    if (context.insertAndCheck(-1, pair.left, pair.right))
-                    {
-                        LOG_OP(0, to_string(Operation::Concatenate), context.allPairs, context.counter);
-                        partitioner.end(0, Operation::Concatenate) = INT_MAX; goto exitEnumeration;
-                    }
-                }
-            }
-        }
-        partitioner.end(0, Operation::Concatenate) = context.lastIdx;
-        LOG_OP(0, to_string(Operation::Concatenate), context.allPairs, context.counter);
-
-        // Or
-        {
-            for (const auto& parent : solutionSet)
-            {
-                auto pairs = invertOr(parent);
-
-                for (size_t k = 0; k < pairs.size(); k++)
-                {
-                    auto pair = pairs[k];
-                    if (context.insertAndCheck(-1, pair.left, pair.right))
-                    {
-                        LOG_OP(0, to_string(Operation::Or), context.allPairs, context.counter);
-                        partitioner.end(0, Operation::Or) = INT_MAX; goto exitEnumeration;
-                    }
-                }
-            }
-        }
-        partitioner.end(0, Operation::Or) = context.lastIdx;
-        LOG_OP(0, to_string(Operation::Or), context.allPairs, context.counter);
     }
 
-    int solvedIndex;
-    int level;
     for (level = 1; level < maxLevel; level++)
     {
+        auto [start, end] = partitioner.Interval(level - 1);
+
         {
-            auto [start, end] = partitioner.Interval(level - 1);
             if (end - start < 1) {
                 int sIdx;
                 context.checkAllVisited(solvedIndex);
@@ -490,108 +554,13 @@ rei::Result rei::Run(const unsigned short* costFun, const unsigned short maxCost
             }
         }
 
-        // Question
-        {
-            auto [start, end] = partitioner.Interval(level - 1);
+        auto res = processLevel(context, partitioner, guideTable, starLookup,
+            std::span(context.cache + start, end - start), level, start);
 
-            for (int parentIdx = start; parentIdx < end; parentIdx++)
-            {
-                auto parent = context.cache[parentIdx];
-                if (parent == CS()) continue;
-
-                if (parent & CS::one())
-                {
-                    if (context.insertAndCheck(parentIdx, parent & (~CS::one())))
-                    {
-                        LOG_OP(level, to_string(Operation::Question), context.allPairs, context.counter);
-                        solvedIndex = context.lastIdx - 1;
-                        partitioner.end(level, Operation::Question) = INT_MAX; goto exitEnumeration;
-                    }
-                }
-            }
+        if (res.first) {
+            solvedIndex = res.second;
+            goto exitEnumeration;
         }
-        partitioner.end(level, Operation::Question) = context.lastIdx;
-        LOG_OP(level, to_string(Operation::Question), context.allPairs, context.counter);
-
-        // Star
-        {
-            auto [start, end] = partitioner.Interval(level - 1);
-
-            for (int parentIdx = start; parentIdx < end; parentIdx++)
-            {
-                auto parent = context.cache[parentIdx];
-                if (parent == CS()) continue;
-
-                if (parent & CS::one())
-                {
-                    auto childs = rei::invertStar(parent, starLookup);
-
-                    for (size_t i = 0; i < childs.size(); i++)
-                    {
-                        if (context.insertAndCheck(parentIdx, childs[i]))
-                        {
-                            LOG_OP(level, to_string(Operation::Star), context.allPairs, context.counter);
-                            solvedIndex = context.lastIdx - 1;
-                            partitioner.end(level, Operation::Star) = INT_MAX; goto exitEnumeration;
-                        }
-                    }
-                }
-            }
-        }
-        partitioner.end(level, Operation::Star) = context.lastIdx;
-        LOG_OP(level, to_string(Operation::Star), context.allPairs, context.counter);
-
-        // Concatenate
-        {
-            auto [start, end] = partitioner.Interval(level - 1);
-            for (int parentIdx = start; parentIdx < end; parentIdx++)
-            {
-                auto parent = context.cache[parentIdx];
-
-                if (parent == CS()) continue;
-
-                auto pairs = invertConcat(parent, guideTable);
-
-                for (size_t k = 0; k < pairs.size(); k++)
-                {
-                    auto pair = pairs[k];
-
-                    if (context.insertAndCheck(parentIdx, pair.left, pair.right))
-                    {
-                        LOG_OP(level, to_string(Operation::Concatenate), context.allPairs, context.counter);
-                        solvedIndex = context.lastIdx - 1;
-                        partitioner.end(level, Operation::Concatenate) = INT_MAX; goto exitEnumeration;
-                    }
-                }
-            }
-        }
-        partitioner.end(level, Operation::Concatenate) = context.lastIdx;
-        LOG_OP(level, to_string(Operation::Concatenate), context.allPairs, context.counter);
-
-        // Or
-        {
-            auto [start, end] = partitioner.Interval(level - 1);
-            for (int parentIdx = start; parentIdx < end; parentIdx++)
-            {
-                auto parent = context.cache[parentIdx];
-                if (parent == CS()) continue;
-
-                auto pairs = invertOr(parent);
-
-                for (size_t k = 0; k < pairs.size(); k++)
-                {
-                    auto pair = pairs[k];
-                    if (context.insertAndCheck(parentIdx, pair.left, pair.right))
-                    {
-                        LOG_OP(level, to_string(Operation::Or), context.allPairs, context.counter);
-                        solvedIndex = context.lastIdx - 1;
-                        partitioner.end(level, Operation::Or) = INT_MAX; goto exitEnumeration;
-                    }
-                }
-            }
-        }
-        partitioner.end(level, Operation::Or) = context.lastIdx;
-        LOG_OP(level, to_string(Operation::Or), context.allPairs, context.counter);
     }
 
 exitEnumeration:
