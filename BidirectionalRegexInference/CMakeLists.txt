@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
 
-project(Top-Down LANGUAGES CXX CUDA)
+project(RegexInference LANGUAGES CXX CUDA)
 
 set(CMAKE_CXX_STANDARD 20)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -40,20 +40,27 @@ include/bitmask.h
 include/util.hpp 
 include/pair.h 
 include/types.h
-include/guide_table.h
+include/guide_table.hpp
 include/operations.h
 include/top_down.hpp
+include/bottom_up.hpp
 include/rei.hpp
-include/level_partitioner.h
+include/level_partitioner.hpp
 include/regex_match.hpp
+include/rei_common.hpp
 )
 
 set(SOURCES
 src/main.cpp
 src/util.cpp 
 src/top_down.cpp
+src/bottom_up.cpp
 src/rei.cpp
 src/regex_match.cpp
+src/guide_table.cpp
+src/level_partitioner.cpp
+src/operations.cpp
+src/rei_common.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

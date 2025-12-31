@@ -1,20 +1,18 @@
-#include <string>
-#include <vector>
-
 #ifndef REI_HPP
 #define REI_HPP
+
+#include <string>
+#include <vector>
 
 namespace rei {
 
     struct Result
     {
         std::string     RE;
-        int             REcost;
-        unsigned long   allREs;
         int             ICsize;
 
-        Result(const std::string& RE, int REcost, unsigned long allREs, int ICsize)
-            : RE(RE), REcost(REcost), allREs(allREs), ICsize(ICsize) {
+        Result(const std::string& RE, int ICsize)
+            : RE(RE), ICsize(ICsize) {
         }
     };
 

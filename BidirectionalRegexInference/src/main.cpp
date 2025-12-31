@@ -6,6 +6,17 @@
 
 #include <regex_match.hpp>
 
+int calculateCost(const std::string& pattren, unsigned short* costFun) {
+    auto counts = rei::countOpreations(pattren);
+    int count = 0;
+    count += counts.alpha * costFun[0];
+    count += counts.question * costFun[1];
+    count += counts.star * costFun[2];
+    count += counts.concat * costFun[3];
+    count += counts.alternation * costFun[4];
+    return count;
+}
+
 int main(int argc, const char* argv[]) {
 
     // -----------------
@@ -61,6 +72,7 @@ int main(int argc, const char* argv[]) {
     }
 
     printf("\n\nRE: \"%s\"\n", res.RE.c_str());
+    printf("Cost: %lu\n", calculateCost(res.RE, costFun));
 
     return 0;
 }
