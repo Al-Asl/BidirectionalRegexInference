@@ -5,6 +5,7 @@
 #include <iostream>
 #include <iomanip>
 #include <functional>
+#include <bit>
 #include <pair.h>
 
 template <class T>
@@ -19,15 +20,28 @@ namespace rei
     /// </summary>
     template <int N>
     struct bitmask {
+
         HD bitmask(const uint64_t(&input)[N]) {
             for (size_t i = 0; i < N; ++i) {
                 data[i] = input[i];
             }
         }
+
         HD bitmask() {
             for (size_t i = 0; i < N; ++i) {
                 data[i] = 0;
             }
+        }
+
+        HD bitmask(const bitmask& other) {
+            for (size_t i = 0; i < N; ++i)
+                data[i] = other.data[i];
+        }
+
+        HD bitmask(bitmask&& other) noexcept {
+            for (size_t i = 0; i < N; ++i)
+                data[i] = other.data[i];
+            for (size_t i = 0; i < N; ++i) other.data[i] = 0;
         }
 
         HD static bitmask all() {
@@ -37,9 +51,16 @@ namespace rei
             }
             return bitmask(vals);
         }
+
         HD static bitmask one() {
             uint64_t vals[N] = {};
             vals[0] = 1;
+            return bitmask(vals);
+        }
+
+        HD static bitmask fromLow(uint64_t lowBits) {
+            uint64_t vals[N] = {};
+            vals[0] = lowBits;
             return bitmask(vals);
         }
 
@@ -104,6 +125,18 @@ namespace rei
 #endif
 
             return { hCS, lCS };
+        }
+
+        HD bitmask& operator=(const bitmask& other) {
+            if (this != &other)
+                for (size_t i = 0; i < N; ++i) data[i] = other.data[i];
+            return *this;
+        }
+
+        HD bitmask& operator=(bitmask&& other) noexcept {
+            if (this != &other)
+                for (size_t i = 0; i < N; ++i) data[i] = other.data[i];
+            return *this;
         }
 
         HD bitmask operator|(const bitmask& solved) const {
@@ -364,7 +397,14 @@ namespace rei
             return os;
         }
 
-        void print() {
+        uint64_t popCount() const {
+            uint64_t pc{};
+            for (size_t i = 0; i < N; i++)
+                pc += std::popcount(data[i]);
+            return pc;
+        }
+
+        void print() const {
             printf("from high to low:");
             for (int i = N - 1; i >= 0; --i) {
                 if (i == 0) {

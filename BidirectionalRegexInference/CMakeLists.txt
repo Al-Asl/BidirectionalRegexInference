@@ -48,6 +48,7 @@ include/rei.hpp
 include/level_partitioner.hpp
 include/regex_match.hpp
 include/rei_common.hpp
+include/cs_utils.h
 )
 
 set(SOURCES
