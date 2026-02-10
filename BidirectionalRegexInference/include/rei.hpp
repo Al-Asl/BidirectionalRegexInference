@@ -10,9 +10,10 @@ namespace rei {
     {
         std::string     RE;
         int             ICsize;
+        uint64_t        allCS;
 
-        Result(const std::string& RE, int ICsize)
-            : RE(RE), ICsize(ICsize) {
+        Result(const std::string& RE, int ICsize, uint64_t allCS)
+            : RE(RE), ICsize(ICsize), allCS(allCS) {
         }
     };
 

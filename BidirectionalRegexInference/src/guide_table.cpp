@@ -44,10 +44,10 @@ bool generatingGuideTable(GuideTable* guideTable, const std::set<std::string, st
         alphabetSize++;
     }
 
-    std::vector<std::vector<CS>> gt;
+    std::vector<std::vector<int>> gt;
 
     for (auto& word : ic) {
-        std::vector<CS> row;
+        std::vector<int> row;
         for (int i = 1; i < word.length(); ++i) {
 
             int index1 = 0;
@@ -61,11 +61,11 @@ bool generatingGuideTable(GuideTable* guideTable, const std::set<std::string, st
                 index2++;
             }
 
-            row.push_back(CS::one() << index1);
-            row.push_back(CS::one() << index2);
+            row.push_back(index1);
+            row.push_back(index2);
         }
 
-        row.push_back(CS());
+        row.push_back(0);
         gt.push_back(row);
     }
 
@@ -101,27 +101,52 @@ bool rei::generatingGuideTable(GuideTable& guideTable, CS& posBits, CS& negBits,
 }
 
 
-rei::GuideTable::Iterator::Iterator(const CS* p) : ptr(p) {}
+rei::GuideTable::Iterator::Iterator(const int* p) : ptr(p) {}
 
-rei::Pair<CS> rei::GuideTable::Iterator::operator*() const { return Pair<CS>(*ptr, *(ptr + 1)); }
+rei::Pair<int> rei::GuideTable::Iterator::operator*() const { return Pair<int>(*ptr, *(ptr + 1)); }
 rei::GuideTable::Iterator& rei::GuideTable::Iterator::operator++() { ptr += 2; return *this; }
 bool rei::GuideTable::Iterator::operator!=(const Iterator& solved) const { return *ptr; }
 
-rei::GuideTable::RowIterator::RowIterator(const CS* data, int gtColumns, int rowIndex) : row(rowIndex), data(data), gtColumns(gtColumns) {}
+rei::GuideTable::RowIterator::RowIterator(const int* data, int gtColumns, int rowIndex) : row(rowIndex), data(data), gtColumns(gtColumns) {}
 rei::GuideTable::Iterator rei::GuideTable::RowIterator::begin() { return Iterator(data + row * gtColumns); }
 rei::GuideTable::Iterator rei::GuideTable::RowIterator::end() { return Iterator(data + (row + 1) * gtColumns); }
 
 
-rei::GuideTable::GuideTable(std::vector<std::vector<CS>> gt, int alphabetSize) : alphabetSize(alphabetSize)
+rei::GuideTable::GuideTable(std::vector<std::vector<int>> gt, int alphabetSize) : alphabetSize(alphabetSize)
 {
     ICsize = static_cast<int> (gt.size());
     gtColumns = static_cast<int> (gt.back().size());
 
-    data = new CS[ICsize * gtColumns];
+    data = new int[ICsize * gtColumns];
 
     for (int i = 0; i < ICsize; ++i) {
         for (int j = 0; j < gt.at(i).size(); ++j) {
             data[i * gtColumns + j] = gt.at(i).at(j);
+        }
+    }
+
+    // construct the adjacency list
+    {
+        std::vector<std::pair<int, int>> row;
+
+        for (int i = 0; i < ICsize; i++)
+            row.emplace_back(i, i);
+
+        adjacencyList.push_back(row);
+    }
+
+    for (int i = 1; i < ICsize; i++)
+    {
+        std::vector<std::pair<int, int>> row;
+        row.emplace_back(0, i);
+        adjacencyList.push_back(row);
+    }
+
+    for (int i = 0; i < ICsize; ++i) {
+        for (int j = 0; j < gt.at(i).size() - 1; j += 2) {
+            auto left_index = gt.at(i).at(j);
+            auto right_index = gt.at(i).at(j + 1);
+            adjacencyList[left_index].emplace_back(right_index, i);
         }
     }
 }

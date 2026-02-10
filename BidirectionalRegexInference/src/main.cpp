@@ -3,6 +3,7 @@
 #include <string>
 #include <util.hpp>
 #include <rei.hpp>
+#include <chrono>
 
 #include <regex_match.hpp>
 
@@ -53,7 +54,11 @@ int main(int argc, const char* argv[]) {
         costFun[i] = std::atoi(argv[i + 2]);
     unsigned short maxCost = std::atoi(argv[7]);
 
+    auto start = std::chrono::high_resolution_clock::now();
+
     auto res = rei::Run(costFun, maxCost, pos, neg, 60 * 60 * 60);
+
+    auto stop = std::chrono::high_resolution_clock::now();
 
     for (auto p : pos)
     {
@@ -73,6 +78,9 @@ int main(int argc, const char* argv[]) {
 
     printf("\n\nRE: \"%s\"\n", res.RE.c_str());
     printf("Cost: %lu\n", calculateCost(res.RE, costFun));
+    printf("REs: %llu\n", res.allCS);
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count();
+    printf("\nRunning Time: %f s\n", (double)duration * 0.000001);
 
     return 0;
 }

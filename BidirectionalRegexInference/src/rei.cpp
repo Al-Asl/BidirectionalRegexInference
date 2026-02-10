@@ -55,17 +55,21 @@ Result RunBottomUp(const GuideTable& guideTable, const std::set<char>& alphabets
     } while (enumState == EnumerationState::NotFound);
 
     if (enumState == EnumerationState::Found)
-        return Result(buRes.RE, guideTable.ICsize);
+        return Result(buRes.RE, guideTable.ICsize, buRes.allREs);
     else
-        return Result("not_found", guideTable.ICsize);
+        return Result("not_found", guideTable.ICsize, buRes.allREs);
 }
 
-Result RunTopDown(const GuideTable& guideTable, const StarLookup& starLookup, const std::set<char>& alphabets, const Costs& costs,
-    const unsigned short maxLevel, const CS& posBits, const CS& negBits, int cache_capacity) {
+Result RunTopDown(const GuideTable& guideTable, const std::set<char>& alphabets, const Costs& costs,
+    const unsigned short maxLevel, const CS& posBits, const CS& negBits, int cache_capacity, int samples = 16) {
 
     TopDownSearchResult tdRes = {};
 
-    TopDownSearch topDown(guideTable, starLookup, std::make_shared<AlphabetResolver>(alphabets), maxLevel, posBits, negBits, cache_capacity);
+    TopDownSearch topDown(guideTable, std::make_shared<AlphabetResolver>(alphabets), maxLevel, posBits, negBits, cache_capacity);
+
+    HeuristicConfigs heuristicConfigs;
+    heuristicConfigs.EnableRandomSamplingForAll(samples);
+    topDown.SetHeuristic(heuristicConfigs);
 
     topDown.Push(CS::one(), tdRes);
     for (int i = 0; i < alphabets.size(); i++)
@@ -77,27 +81,31 @@ Result RunTopDown(const GuideTable& guideTable, const StarLookup& starLookup, co
     } while (enumState == EnumerationState::NotFound);
 
     if (enumState == EnumerationState::Found)
-        return Result(tdRes.RE, guideTable.ICsize);
+        return Result(tdRes.RE, guideTable.ICsize, tdRes.allCS);
     else
-        return Result("not_found", guideTable.ICsize);
+        return Result("not_found", guideTable.ICsize, tdRes.allCS);
 }
 
-Result RunBidirectional(const GuideTable& guideTable, const StarLookup& starLookup, const std::set<char>& alphabets, 
-    const Costs& costs, const unsigned short maxCost, const CS& posBits, const CS& negBits) {
+Result RunBidirectional(const GuideTable& guideTable, const std::set<char>& alphabets, 
+    const Costs& costs, const unsigned short maxCost, const CS& posBits, const CS& negBits, int topDownsamples = 16) {
 
     // Bottom-Up
     int buCacheCapacity = 2000000;
-    int levels = 11;
+    int levels = 13;
     BottomUpSearchResult buRes = {};
 
     BottomUpSearch bottomUp(guideTable, alphabets, costs, maxCost, posBits, negBits, buCacheCapacity);
 
     // Top-Down
     int maxLevel = 50;
-    int tdCacheCapacity = 2000000;
+    int tdCacheCapacity = 8000000;
     TopDownSearchResult tdRes = {};
 
-    TopDownSearch topDown(guideTable, starLookup, std::make_shared<BottomUpResolver>(bottomUp), maxLevel, posBits, negBits, tdCacheCapacity);
+    TopDownSearch topDown(guideTable, std::make_shared<BottomUpResolver>(bottomUp), maxLevel, posBits, negBits, tdCacheCapacity);
+
+    HeuristicConfigs heuristicConfigs;
+    heuristicConfigs.EnableRandomSamplingForAll(topDownsamples);
+    topDown.SetHeuristic(heuristicConfigs);
 
     topDown.Push(CS::one(), tdRes);
     for (int i = 0; i < alphabets.size(); i++)
@@ -108,22 +116,23 @@ Result RunBidirectional(const GuideTable& guideTable, const StarLookup& starLook
     int i = 0;
     do {
         enumState = bottomUp.EnumerateCostLevel(buRes);
+        if (enumState != EnumerationState::NotFound) break;
         auto plevel = bottomUp.GetLastCostLevel();
         for (const auto& cs : plevel)
             topDown.Push(cs, tdRes);
-    } while (enumState == EnumerationState::NotFound && ++i < levels);
+    } while (++i < levels);
 
     if (enumState == EnumerationState::Found)
-        return Result(buRes.RE, guideTable.ICsize);
+        return Result(buRes.RE, guideTable.ICsize, buRes.allREs);
 
     do {
         enumState = topDown.EnumerateLevel(tdRes);
     } while (enumState == EnumerationState::NotFound);
 
     if (enumState == EnumerationState::Found)
-        return Result(tdRes.RE, guideTable.ICsize);
+        return Result(tdRes.RE, guideTable.ICsize, tdRes.allCS + buRes.allREs);
     else
-        return Result("not_found", guideTable.ICsize);
+        return Result("not_found", guideTable.ICsize, tdRes.allCS + buRes.allREs);
 }
 
 rei::Result rei::Run(const unsigned short* costFun, const unsigned short maxCost,
@@ -135,17 +144,16 @@ rei::Result rei::Run(const unsigned short* costFun, const unsigned short maxCost
     CS posBits, negBits;
 
     if (!generatingGuideTable(guideTable, posBits, negBits, pos, neg))
-        return Result("not_found", 0);
+        return Result("not_found", 0, 0);
 
-    StarLookup starLookup(guideTable);
     Costs costs(costFun);
 
     auto alphabets = findAlphabets(pos, neg);
-    if(intialCheck(alphabets, pos, RE)) return Result(RE, guideTable.ICsize);
+    if(intialCheck(alphabets, pos, RE)) return Result(RE, guideTable.ICsize, alphabets.size() + 2);
 
     //return RunBottomUp(guideTable, alphabets, costs, maxCost, posBits, negBits, 20000000);
 
-    //return RunTopDown(guideTable, starLookup, alphabets, costs, 50, posBits, negBits, 20000000);
+    //return RunTopDown(guideTable, alphabets, costs, 50, posBits, negBits, 20000000);
 
-    return RunBidirectional(guideTable, starLookup, alphabets, costs, maxCost, posBits, negBits);
+    return RunBidirectional(guideTable, alphabets, costs, maxCost, posBits, negBits, 64);
 }

@@ -13,7 +13,36 @@ namespace rei {
 
 	struct TopDownSearchResult {
 		std::string RE;
+        uint64_t allCS;
 	};
+
+    struct HeuristicConfigs {
+    public:
+        bool solutionSetUseRandomSampling = false;
+        int  solutionSetMaxSamples = 0;
+
+        bool invertStarUseRandomSampling = false;
+        int  invertStarMaxSamples = 0;
+
+        bool invertConcatUseRandomSampling = false;
+        int  invertConcatMaxSamples = 0;
+
+        bool invertOrUseRandomSampling = false;
+        int  invertOrMaxSamples = 0;
+
+        void EnableRandomSamplingForAll(int maxSamples) {
+            solutionSetUseRandomSampling = true;
+            invertStarUseRandomSampling = true;
+            invertConcatUseRandomSampling = true;
+            invertOrUseRandomSampling = true;
+
+            solutionSetMaxSamples = maxSamples;
+            invertStarMaxSamples = maxSamples;
+            invertConcatMaxSamples = maxSamples;
+            invertOrMaxSamples = maxSamples;
+        }
+    };
+
 
     class TopDownSearch
     {
@@ -105,15 +134,19 @@ namespace rei {
 
     public:
 
-        TopDownSearch(const GuideTable& guideTable, const StarLookup& starLookup,
+        TopDownSearch(const GuideTable& guideTable,
             std::shared_ptr<CSResolverInterface> resolver, int maxLevel, const CS& posBits, const CS& negBits, int cache_capacity);
         bool Push(const CS& cs, TopDownSearchResult& res);
 
         EnumerationState EnumerateLevel(TopDownSearchResult& res);
 
+        void SetHeuristic(HeuristicConfigs heuristicConfigs);
+
     private:
 
         std::vector<CS> generateSolutionSet();
+
+        std::vector<CS> randomSampleSolutionSet(size_t maxSamples, uint64_t seed = std::random_device{}());
 
         EnumerationState enumerateLevel(const std::span<CS>& CSs, int startPIdx, int& idx, bool overrideParent = false, int opIdx = 0);
 
@@ -128,11 +161,12 @@ namespace rei {
         const CS& posBits;
         const CS& negBits;
         const rei::GuideTable& guideTable;
-        const rei::StarLookup& starLookup;
         std::shared_ptr<CSResolverInterface> resolver;
 
         LevelPartitioner partitioner;
         Context context;
+
+        HeuristicConfigs heuristicConfigs;
     };
 }
 

@@ -1,5 +1,7 @@
 #include <top_down.hpp>
 
+#include <cs_utils.h>
+
 #define LOG_OP(levelnum, op_string, allCS, counter) \
         printf("Level %-2d | (%s) | AllCS: %-11llu | S %-5llu | NV %-11llu | V %-11llu | C %-11llu | SS %-5llu | G %-5llu \n", \
             levelnum, op_string.c_str() ,allCS,  counter.solved, counter.notVisited, counter.visited, counter.cyclic, counter.selfSolved, counter.given);
@@ -180,9 +182,9 @@ int rei::TopDownSearch::Context::getOutmostParent(int index) {
 }
 
 
-rei::TopDownSearch::TopDownSearch(const rei::GuideTable& guideTable, const rei::StarLookup& starLookup,
+rei::TopDownSearch::TopDownSearch(const rei::GuideTable& guideTable,
     std::shared_ptr<rei::CSResolverInterface> resolver, int maxLevel, const CS& posBits, const CS& negBits, int cache_capacity) :
-    guideTable(guideTable), starLookup(starLookup), resolver(resolver), partitioner(maxLevel), context(cache_capacity),
+    guideTable(guideTable), resolver(resolver), partitioner(maxLevel), context(cache_capacity),
     maxLevel(maxLevel), posBits(posBits), negBits(negBits), cache_capacity(cache_capacity) {
 
     // the index 0 and 1 are reserved for checking
@@ -210,7 +212,12 @@ EnumerationState rei::TopDownSearch::EnumerateLevel(TopDownSearchResult& res)
 
     if (level == 0)
     {
-        auto solutionSet = generateSolutionSet();
+        vector<CS> solutionSet;
+        if(heuristicConfigs.solutionSetUseRandomSampling)
+            solutionSet = randomSampleSolutionSet(heuristicConfigs.solutionSetMaxSamples);
+        else
+            solutionSet = generateSolutionSet();
+
         context.AddSolutionSet(solutionSet);
         enumState = enumerateLevel(solutionSet, 2, solvedIdx, true, -1);
     }
@@ -229,12 +236,55 @@ EnumerationState rei::TopDownSearch::EnumerateLevel(TopDownSearchResult& res)
     }
 
     if (enumState == EnumerationState::Found)
-    {
         res.RE = constructDownward(solvedIdx);
-    }
+    res.allCS = context.lastIdx;
 
     level++;
     return enumState;
+}
+
+void rei::TopDownSearch::SetHeuristic(HeuristicConfigs configs)
+{
+    heuristicConfigs = configs;
+}
+
+std::vector<CS> rei::TopDownSearch::randomSampleSolutionSet(size_t maxSamples, uint64_t seed)
+{
+    std::vector<int> dontCareBits;
+    dontCareBits.reserve(guideTable.ICsize);
+
+    const CS combined = posBits | negBits;
+    for (int i = 0; i < guideTable.ICsize; ++i)
+    {
+        const CS bitMask = CS::one() << i;
+        if ((bitMask & combined) == CS())
+        {
+            dontCareBits.push_back(i);
+        }
+    }
+
+    const size_t numDontCareBits = dontCareBits.size();
+
+    if (numDontCareBits < 64 && (1ULL << numDontCareBits) <= maxSamples)
+        return generateSolutionSet();
+
+    std::vector<CS> result;
+    result.reserve(maxSamples);
+
+    std::mt19937_64 rng(seed);
+    std::bernoulli_distribution coin(0.5);
+
+    std::unordered_set<CS> visited;
+
+    while (result.size() < maxSamples) {
+
+        CS submask = getRandom(dontCareBits, rng, coin) | posBits;
+
+        if (visited.insert(submask).second)
+            result.emplace_back(submask);
+    }
+
+    return result;
 }
 
 std::vector<CS> rei::TopDownSearch::generateSolutionSet()
@@ -253,7 +303,7 @@ std::vector<CS> rei::TopDownSearch::generateSolutionSet()
     }
 
     const size_t numDontCareBits = dontCareBits.size();
-    const size_t numCombinations = 1u << numDontCareBits;
+    const size_t numCombinations = 1ULL << numDontCareBits;
 
     std::vector<CS> combinations;
     combinations.reserve(numCombinations);
@@ -264,7 +314,7 @@ std::vector<CS> rei::TopDownSearch::generateSolutionSet()
 
         for (size_t bit = 0; bit < numDontCareBits; ++bit)
         {
-            if (subset & (1u << bit))
+            if (subset & (1ULL << bit))
             {
                 combination |= (CS::one() << dontCareBits[bit]);
             }
@@ -310,7 +360,12 @@ EnumerationState rei::TopDownSearch::enumerateLevel(const std::span<CS>& CSs, in
 
         if (parent & CS::one())
         {
-            auto childs = rei::revertStar(parent, starLookup);
+            std::vector<CS> childs;
+
+            if(heuristicConfigs.invertStarUseRandomSampling)
+                childs = rei::revertStarRandom(parent, heuristicConfigs.invertStarMaxSamples, guideTable);
+            else
+                childs = rei::revertStar(parent, guideTable);
 
             for (size_t i = 0; i < childs.size(); i++)
             {
@@ -336,7 +391,12 @@ EnumerationState rei::TopDownSearch::enumerateLevel(const std::span<CS>& CSs, in
         pIdx++;
         if (parent == CS()) continue;
 
-        auto pairs = revertConcat(parent, guideTable);
+        std::vector<Pair<CS>> pairs;
+
+        if(heuristicConfigs.invertConcatUseRandomSampling)
+            pairs = revertConcatRandom(parent, heuristicConfigs.invertConcatMaxSamples, guideTable);
+        else
+            pairs = revertConcat(parent, guideTable);
 
         for (size_t i = 0; i < pairs.size(); i++)
         {
@@ -363,7 +423,12 @@ EnumerationState rei::TopDownSearch::enumerateLevel(const std::span<CS>& CSs, in
         pIdx++;
         if (parent == CS()) continue;
 
-        auto pairs = revertOr(parent);
+        std::vector<Pair<CS>> pairs;
+
+        if(heuristicConfigs.invertOrUseRandomSampling)
+            pairs = revertOrRandom(parent, heuristicConfigs.invertOrMaxSamples, guideTable.ICsize);
+        else
+            pairs = revertOr(parent);
 
         for (size_t i = 0; i < pairs.size(); i++)
         {

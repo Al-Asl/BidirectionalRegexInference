@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 #include <types.h>
+#include <random>
+#include <utility>
+#include <functional>
 #include <guide_table.hpp>
 
 template<typename T>
@@ -21,21 +24,21 @@ namespace rei
 
     inline CS processStar(const GuideTable& guideTable, const CS& cs) {
 
-        auto cs1 = cs | CS::one();
+        auto res = cs | CS::one();
         int ix = guideTable.alphabetSize + 1;
         CS c = CS::one() << ix;
 
         while (ix < guideTable.ICsize)
         {
-            if (!(cs1 & c)) {
+            if (!(res & c)) {
                 for (auto [left, right] : guideTable.IterateRow(ix)) {
-                    if ((left & cs1) && (right & cs1)) { cs1 |= c; break; }
+                    if (((CS::one() << left) & res) && ((CS::one() << right) & res)) { res |= c; break; }
                 }
             }
             c <<= 1; ix++;
         }
 
-        return cs1;
+        return res;
     }
 
     inline CS processConcatenate(const GuideTable& guideTable, const CS& left, const CS& right) {
@@ -52,7 +55,7 @@ namespace rei
             // when CS have value that means one of parts contains phi, check above
             if (!(cs1 & c)) {
                 for (auto [l, r] : guideTable.IterateRow(ix))
-                    if ((l & left) && (r & right)) { cs1 |= c; break; }
+                    if (((CS::one() << l) & left) && ((CS::one() << r) & right)) { cs1 |= c; break; }
             }
 
             c <<= 1; ix++;
@@ -65,18 +68,19 @@ namespace rei
         return left | right;
     }
 
-    class StarLookup {
-    public:
-        StarLookup(const GuideTable& guideTable);
-        std::vector<CS> data;
-    };
-
     std::vector<CS> revertQuestion(const CS& cs);
 
-    std::vector<CS> revertStar(const CS& cs, const StarLookup& starLookup);
+    std::vector<CS> revertStarRandom(const CS& cs, size_t maxSamples, const GuideTable& guideTable, uint64_t seed = std::random_device{}());
+    // revert with brute force
+    std::vector<CS> revertStarBrute(const GuideTable& guideTable, const CS& target);
+    std::vector<CS> revertStar(const CS& cs, const GuideTable& guideTable);
 
+    std::vector<Pair<CS>> revertConcatRandom(const CS& cs, size_t maxSamples, const GuideTable& guideTable, uint64_t seed = std::random_device{}());
+    // revert with brute force
+    std::vector<Pair<CS>> revertConcatBrute(const CS& target, const GuideTable& guideTable);
     std::vector<Pair<CS>> revertConcat(const CS& cs, const GuideTable& guideTable);
 
+    std::vector<Pair<CS>> revertOrRandom(const CS& cs, size_t maxSamples, int ICsize, uint64_t seed = std::random_device{}());
     vector<Pair<CS>> revertOr(const CS& cs);
 }
 

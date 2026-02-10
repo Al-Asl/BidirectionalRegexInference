@@ -83,11 +83,10 @@ rei::EnumerationState rei::BottomUpSearch::EnumerateCostLevel(BottomUpSearchResu
     EnumerationState enumState = enumerateLevel(solvedIdx);
 
     if (enumState == EnumerationState::Found)
-    {
         res.RE = constructDownward(solvedIdx);
-        res.cost = costLevel;
-        res.allREs = context.allREs;
-    }
+
+    res.cost = costLevel;
+    res.allREs = context.allREs;
 
     costLevel++;
     return enumState;
