@@ -1,0 +1,10 @@
+^C:\USERS\HONEY\DESKTOP\MASTER PROJECT\BIDIRECTIONALREGEXINFERENCE\BIDIRECTIONALREGEXINFERENCE\BUILD\CMAKEFILES\148F848509F416D7ABFE05CDF392FD11\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/Honey/Desktop/Master Project/BidirectionalRegexInference/BidirectionalRegexInference" "-BC:/Users/Honey/Desktop/Master Project/BidirectionalRegexInference/BidirectionalRegexInference/build" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "C:/Users/Honey/Desktop/Master Project/BidirectionalRegexInference/BidirectionalRegexInference/build/RegexInference.sln"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

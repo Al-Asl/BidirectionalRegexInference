@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\top_down.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\bottom_up.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\rei.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\regex_match.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\guide_table.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\level_partitioner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\operations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\rei_common.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\include\bitmask.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\include\util.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\include\pair.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\include\types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\include\guide_table.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\include\operations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\include\top_down.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\include\bottom_up.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\include\rei.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\include\level_partitioner.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\include\regex_match.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\include\rei_common.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\include\cs_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{E42CE1A8-342D-33B2-BA81-A2FA11B72DA5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{30427289-6151-3B0A-B69E-D7B71CF0DBE9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

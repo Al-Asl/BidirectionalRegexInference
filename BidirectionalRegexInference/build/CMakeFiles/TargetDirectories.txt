@@ -1,0 +1,3 @@
+C:/Users/Honey/Desktop/Master Project/BidirectionalRegexInference/BidirectionalRegexInference/build/CMakeFiles/RegexInference.dir
+C:/Users/Honey/Desktop/Master Project/BidirectionalRegexInference/BidirectionalRegexInference/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/Honey/Desktop/Master Project/BidirectionalRegexInference/BidirectionalRegexInference/build/CMakeFiles/ZERO_CHECK.dir

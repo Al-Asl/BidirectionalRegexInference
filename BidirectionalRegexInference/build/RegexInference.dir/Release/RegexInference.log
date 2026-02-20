@@ -1,0 +1,74 @@
+﻿  Building Custom Rule C:/Users/Honey/Desktop/Master Project/BidirectionalRegexInference/BidirectionalRegexInference/CMakeLists.txt
+  main.cpp
+  util.cpp
+  top_down.cpp
+  bottom_up.cpp
+C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\bottom_up.cpp(168,9): warning C4477: 'printf' : format string '%-11llu' requires an argument of type 'unsigned __int64', but variadic argument 3 has type 'unsigned long'
+      C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\bottom_up.cpp(168,9):
+      consider using '%lu' in the format string
+  
+C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\bottom_up.cpp(190,9): warning C4477: 'printf' : format string '%-11llu' requires an argument of type 'unsigned __int64', but variadic argument 3 has type 'unsigned long'
+      C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\bottom_up.cpp(190,9):
+      consider using '%lu' in the format string
+  
+C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\bottom_up.cpp(212,9): warning C4477: 'printf' : format string '%-11llu' requires an argument of type 'unsigned __int64', but variadic argument 3 has type 'unsigned long'
+      C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\bottom_up.cpp(212,9):
+      consider using '%lu' in the format string
+  
+C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\bottom_up.cpp(245,9): warning C4477: 'printf' : format string '%-11llu' requires an argument of type 'unsigned __int64', but variadic argument 3 has type 'unsigned long'
+      C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\bottom_up.cpp(245,9):
+      consider using '%lu' in the format string
+  
+C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\bottom_up.cpp(265,9): warning C4477: 'printf' : format string '%-11llu' requires an argument of type 'unsigned __int64', but variadic argument 3 has type 'unsigned long'
+      C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\bottom_up.cpp(265,9):
+      consider using '%lu' in the format string
+  
+  rei.cpp
+  regex_match.cpp
+  guide_table.cpp
+  level_partitioner.cpp
+  operations.cpp
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\functional(882,31): warning C4267: 'return': conversion from 'size_t' to '_Rx', possible loss of data
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\functional(882,31): warning C4267:         with
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\functional(882,31): warning C4267:         [
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\functional(882,31): warning C4267:             _Rx=int
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\functional(882,31): warning C4267:         ]
+  (compiling source file '../src/operations.cpp')
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\functional(882,31):
+      the template instantiation context (the oldest one first) is
+          C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\operations.cpp(581,67):
+          see reference to function template instantiation 'std::function<int (int)>::function<revertConcatPrimary::<lambda_1>,0>(_Fx &&)' being compiled
+          with
+          [
+              _Fx=revertConcatPrimary::<lambda_1>
+          ]
+              C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\operations.cpp(580,30):
+              see the first reference to 'std::function<int (int)>::function' in 'revertConcatPrimary'
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\functional(1106,15):
+          see reference to function template instantiation 'void std::_Func_class<_Ret,int>::_Reset<_Ty>(_Fx &&)' being compiled
+          with
+          [
+              _Ret=int,
+              _Ty=revertConcatPrimary::<lambda_1>,
+              _Fx=revertConcatPrimary::<lambda_1>
+          ]
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\functional(973,23):
+          see reference to variable template 'const bool _Is_large<std::_Func_impl_no_alloc<`revertConcatPrimary'::`2'::<lambda_1>,int,int> >' being compiled
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\functional(749,28):
+          see reference to class template instantiation 'std::_Func_impl_no_alloc<revertConcatPrimary::<lambda_1>,_Ret,int>' being compiled
+          with
+          [
+              _Ret=int
+          ]
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\functional(878,9):
+          while compiling class template member function '_Rx std::_Func_impl_no_alloc<revertConcatPrimary::<lambda_1>,_Rx,int>::_Do_call(int &&)'
+          with
+          [
+              _Rx=int
+          ]
+  
+  rei_common.cpp
+  Generating Code...
+C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\bottom_up.cpp(151,1): warning C4715: 'rei::BottomUpSearch::constructDownward': not all control paths return a value
+C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\src\top_down.cpp(513,1): warning C4715: 'rei::TopDownSearch::constructDownward': not all control paths return a value
+  RegexInference.vcxproj -> C:\Users\Honey\Desktop\Master Project\BidirectionalRegexInference\BidirectionalRegexInference\build\Release\RegexInference.exe
