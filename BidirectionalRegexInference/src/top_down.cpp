@@ -2,17 +2,26 @@
 
 #include <cs_utils.h>
 
-#define LOG_OP(levelnum, op_string, allCS, counter) \
+#define LOG_OP(levelIdx, op_string, allCS, counter) \
         printf("Level %-2d | (%s) | AllCS: %-11llu | S %-5llu | NV %-11llu | V %-11llu | C %-11llu | SS %-5llu | G %-5llu \n", \
-            levelnum, op_string.c_str() ,allCS,  counter.solved, counter.notVisited, counter.visited, counter.cyclic, counter.selfSolved, counter.given);
+            levelIdx + 1, op_string.c_str() ,allCS,  counter.solved, counter.notVisited, counter.visited, counter.cyclic, counter.selfSolved, counter.given);
+
+// the start index of the language cache
+#define LC_START 2
+
+#define STATUS_NOTVISITED 0
+#define STATUS_GIVEN -1
+#define VISITED_SOLUTIONSET -1
+#define VISITED_GIVEN -1
+#define PARENTIDX_SOLUTIONSET -1
 
 using namespace rei;
 
 rei::TopDownSearch::Context::Context(int cache_capacity)
 {
-    status = new int[cache_capacity + 2];
-    parentIdx = new int[cache_capacity + 2];
-    cache = new CS[cache_capacity + 2];
+    status      = new int[cache_capacity + LC_START];
+    parentIdx   = new int[cache_capacity + LC_START];
+    cache       = new CS[cache_capacity + LC_START];
 
     lastIdx = 0;
     allCS = 0;
@@ -28,13 +37,13 @@ rei::TopDownSearch::Context::~Context()
 
 void rei::TopDownSearch::Context::AddSolutionSet(const std::vector<CS>& solutionSet) {
     for (size_t i = 0; i < solutionSet.size(); i++)
-        visited[solutionSet[i]] = -1;
+        visited[solutionSet[i]] = VISITED_SOLUTIONSET;
 }
 
 bool rei::TopDownSearch::Context::AddSolvedNode(const CS& cs, int& idx) {
     if (visited.find(cs) == visited.end())
     {
-        visited[cs] = -1;
+        visited[cs] = VISITED_GIVEN;
         solved.insert(cs);
         return false;
     }
@@ -63,7 +72,7 @@ bool rei::TopDownSearch::Context::InsertAndCheck(int parentIdx, CS left, CS righ
 
     if ((static_cast<int>(lt) > 2) && (static_cast<int>(rt) > 2))
     {
-        if (parentIdx == -1) return true;
+        if (parentIdx == PARENTIDX_SOLUTIONSET) return true;
         return recursiveCheck(parentIdx, lastIdx - 2);
     }
 
@@ -86,7 +95,7 @@ bool rei::TopDownSearch::Context::CheckAllVisited(int& solvedIndex) {
     {
         if (!isSolved(idx) || !isSolved(idx + 1)) continue;
 
-        if (parentIdx[idx] == -1 ? true : recursiveCheck(parentIdx[idx], idx))
+        if (parentIdx[idx] == PARENTIDX_SOLUTIONSET ? true : recursiveCheck(parentIdx[idx], idx))
         {
             solvedIndex = getOutmostParent(idx);
             return true;
@@ -105,16 +114,17 @@ rei::TopDownSearch::Context::NodeType rei::TopDownSearch::Context::getNodeType(c
     auto vit = visited.find(cs);
     if (vit == visited.end())
         return NodeType::NotVistied;
+
     if (solved.find(cs) == solved.end())
     {
-        if ((*vit).second == -1) // we only test the solution set
+        if ((*vit).second == VISITED_SOLUTIONSET) // we only test the solution set
             return NodeType::Cyclic;
         else
             return NodeType::Vistied;
     }
     else
     {
-        if ((*vit).second == -1)
+        if ((*vit).second == VISITED_GIVEN)
             return NodeType::Given;
         else
             return NodeType::SelfSolved;
@@ -127,7 +137,7 @@ void rei::TopDownSearch::Context::insert(NodeType nodeType, CS cs, int pIdx)
     case NodeType::NotVistied:
         cache[lastIdx] = cs;
         visited[cs] = lastIdx;
-        status[lastIdx] = 0;
+        status[lastIdx] = STATUS_NOTVISITED;
         break;
     case NodeType::Vistied:
         status[lastIdx] = -visited.at(cs);
@@ -137,7 +147,7 @@ void rei::TopDownSearch::Context::insert(NodeType nodeType, CS cs, int pIdx)
         idxToSolved[lastIdx] = cs;
         break;
     case NodeType::Given:
-        status[lastIdx] = -1;
+        status[lastIdx] = STATUS_GIVEN;
         idxToSolved[lastIdx] = cs;
         break;
     }
@@ -147,8 +157,8 @@ void rei::TopDownSearch::Context::insert(NodeType nodeType, CS cs, int pIdx)
 
 bool rei::TopDownSearch::Context::isSolved(int idx) {
     auto s = status[idx];
-    if (s == -1 || s > 1) return true;
-    if (s < -1) return idxToSolved.find(-s) != idxToSolved.end();
+    if (s == STATUS_GIVEN || s >= LC_START) return true;
+    if (s <= -LC_START) return idxToSolved.find(-s) != idxToSolved.end();
     return false;
 }
 
@@ -168,14 +178,14 @@ bool rei::TopDownSearch::Context::recursiveCheck(int index, int lcIdx)
 
     if (!isSolved(sIdx)) return false;
 
-    if (pIdx < 0) // the solved set parents is -1
+    if (pIdx == PARENTIDX_SOLUTIONSET)
         return true;
 
     return recursiveCheck(pIdx, index < sIdx ? index : sIdx);
 }
 
 int rei::TopDownSearch::Context::getOutmostParent(int index) {
-    if (parentIdx[index] == -1)
+    if (parentIdx[index] == PARENTIDX_SOLUTIONSET)
         return index;
     else
         return getOutmostParent(parentIdx[index]);
@@ -187,9 +197,8 @@ rei::TopDownSearch::TopDownSearch(const rei::GuideTable& guideTable,
     guideTable(guideTable), resolver(resolver), partitioner(maxLevel), context(cache_capacity),
     maxLevel(maxLevel), posBits(posBits), negBits(negBits), cache_capacity(cache_capacity) {
 
-    // the index 0 and 1 are reserved for checking
-    partitioner.start(0, Operation::Question) = 2;
-    context.lastIdx = 2;
+    partitioner.start(0, Operation::Question) = LC_START;
+    context.lastIdx = LC_START;
 }
 
 bool rei::TopDownSearch::Push(const CS& cs, TopDownSearchResult& res) {
@@ -219,7 +228,7 @@ EnumerationState rei::TopDownSearch::EnumerateLevel(TopDownSearchResult& res)
             solutionSet = generateSolutionSet();
 
         context.AddSolutionSet(solutionSet);
-        enumState = enumerateLevel(solutionSet, 2, solvedIdx, true, -1);
+        enumState = enumerateLevel(solutionSet, LC_START, solvedIdx, true, PARENTIDX_SOLUTIONSET);
     }
     else
     {
@@ -235,9 +244,12 @@ EnumerationState rei::TopDownSearch::EnumerateLevel(TopDownSearchResult& res)
             enumState = enumerateLevel(std::span(context.cache + start, end - start), start, solvedIdx);
     }
 
-    if (enumState == EnumerationState::Found)
-        res.RE = constructDownward(solvedIdx);
-    res.allCS = context.lastIdx;
+    if (enumState != EnumerationState::NotFound)
+    {
+        if (enumState == EnumerationState::Found)
+            res.RE = constructDownward(solvedIdx);
+        res.allCS = context.lastIdx;
+    }
 
     level++;
     return enumState;
@@ -337,7 +349,7 @@ EnumerationState rei::TopDownSearch::enumerateLevel(const std::span<CS>& CSs, in
 
         if (parent & CS::one())
         {
-            if (context.lastIdx > cache_capacity) return EnumerationState::End;
+            if (context.lastIdx + 2 >= cache_capacity + LC_START) return EnumerationState::End;
 
             if (context.InsertAndCheck(overrideParent ? opIdx : pIdx, parent & (~CS::one())))
             {
@@ -369,7 +381,7 @@ EnumerationState rei::TopDownSearch::enumerateLevel(const std::span<CS>& CSs, in
 
             for (size_t i = 0; i < childs.size(); i++)
             {
-                if (context.lastIdx > cache_capacity) return EnumerationState::End;
+                if (context.lastIdx + 2 >= cache_capacity + LC_START) return EnumerationState::End;
 
                 if (context.InsertAndCheck(overrideParent ? opIdx : pIdx, childs[i]))
                 {
@@ -402,7 +414,7 @@ EnumerationState rei::TopDownSearch::enumerateLevel(const std::span<CS>& CSs, in
         {
             auto pair = pairs[i];
 
-            if (context.lastIdx > cache_capacity) return EnumerationState::End;
+            if (context.lastIdx + 2 >= cache_capacity + LC_START) return EnumerationState::End;
 
             if (context.InsertAndCheck(overrideParent ? opIdx : pIdx, pair.left, pair.right))
             {
@@ -434,7 +446,7 @@ EnumerationState rei::TopDownSearch::enumerateLevel(const std::span<CS>& CSs, in
         {
             auto pair = pairs[i];
 
-            if (context.lastIdx > cache_capacity) return EnumerationState::End;
+            if (context.lastIdx + 2 >= cache_capacity + LC_START) return EnumerationState::End;
 
             if (context.InsertAndCheck(overrideParent ? opIdx : pIdx, pair.left, pair.right))
             {
@@ -464,12 +476,12 @@ std::string rei::TopDownSearch::bracket(std::string s) {
 std::string rei::TopDownSearch::constructDownward(int index)
 {
     std::string left;
-    if (context.status[index] == -1)
+    if (context.status[index] == STATUS_GIVEN)
         left = resolver->resolve(context.idxToSolved.at(index));
     else
     {
         auto ls = context.status[index];
-        left = constructDownward(ls < -1 ? context.status[-ls] : ls);
+        left = constructDownward(ls <= -LC_START ? context.status[-ls] : ls);
     }
 
     int level;
@@ -493,12 +505,12 @@ std::string rei::TopDownSearch::constructDownward(int index)
     }
 
     std::string right;
-    if (context.status[++index] == -1)
+    if (context.status[++index] == STATUS_GIVEN)
         right = resolver->resolve(context.idxToSolved.at(index));
     else
     {
         auto rs = context.status[index];
-        right = constructDownward(rs < -1 ? context.status[-rs] : rs);
+        right = constructDownward(rs <= -LC_START ? context.status[-rs] : rs);
     }
 
     if (op == Operation::Concatenate)
