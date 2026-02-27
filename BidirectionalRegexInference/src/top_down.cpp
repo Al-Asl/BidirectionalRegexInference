@@ -11,9 +11,11 @@
 
 #define STATUS_NOTVISITED 0
 #define STATUS_GIVEN -1
-#define VISITED_SOLUTIONSET -1
+
+#define VISITED_SOLUTIONSET 0
 #define VISITED_GIVEN -1
-#define PARENTIDX_SOLUTIONSET -1
+
+#define PARENTIDX_SOLUTIONSET 0
 
 using namespace rei;
 
@@ -44,7 +46,6 @@ bool rei::TopDownSearch::Context::AddSolvedNode(const CS& cs, int& idx) {
     if (visited.find(cs) == visited.end())
     {
         visited[cs] = VISITED_GIVEN;
-        solved.insert(cs);
         return false;
     }
     else
@@ -115,20 +116,16 @@ rei::TopDownSearch::Context::NodeType rei::TopDownSearch::Context::getNodeType(c
     if (vit == visited.end())
         return NodeType::NotVistied;
 
-    if (solved.find(cs) == solved.end())
-    {
-        if ((*vit).second == VISITED_SOLUTIONSET) // we only test the solution set
-            return NodeType::Cyclic;
-        else
-            return NodeType::Vistied;
-    }
+    auto idx = (*vit).second;
+
+    if (idx <= -LC_START)
+        return NodeType::SelfSolved;
+    else if (idx == VISITED_GIVEN)
+        return NodeType::Given;
+    else if (idx == VISITED_SOLUTIONSET)
+        return NodeType::Cyclic; // we only test the solution set
     else
-    {
-        if ((*vit).second == VISITED_GIVEN)
-            return NodeType::Given;
-        else
-            return NodeType::SelfSolved;
-    }
+        return NodeType::Vistied;
 }
 
 void rei::TopDownSearch::Context::insert(NodeType nodeType, CS cs, int pIdx)
@@ -143,7 +140,7 @@ void rei::TopDownSearch::Context::insert(NodeType nodeType, CS cs, int pIdx)
         status[lastIdx] = -visited.at(cs);
         break;
     case NodeType::SelfSolved:
-        status[lastIdx] = -visited.at(cs);
+        status[lastIdx] = visited.at(cs);
         idxToSolved[lastIdx] = cs;
         break;
     case NodeType::Given:
@@ -167,7 +164,7 @@ bool rei::TopDownSearch::Context::recursiveCheck(int index, int lcIdx)
     if (isSolved(index)) return false;
 
     // we can reconstruct the cs recursively, we don't need cache
-    solved.insert(cache[index]);
+    visited[cache[index]] = -index;
     status[index] = lcIdx;
     idxToSolved[index] = cache[index];
 

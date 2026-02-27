@@ -129,7 +129,6 @@ namespace rei {
             int* parentIdx;
 
             std::unordered_map<CS, int> visited;
-            std::unordered_set<CS> solved; // a subset of visited
         };
 
     public:
