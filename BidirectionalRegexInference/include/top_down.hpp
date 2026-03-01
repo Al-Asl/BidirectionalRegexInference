@@ -57,6 +57,34 @@ namespace rei {
                 Given = 4,
             };
 
+            struct SolvedNode {
+                int leftIdx;
+                CS cs;
+
+                SolvedNode() : cs(CS()), leftIdx(0) {}
+                SolvedNode(const CS& cs, int leftIdx) : cs(cs), leftIdx(leftIdx) {}
+                SolvedNode(const CS& cs) : cs(cs), leftIdx(0) {}
+
+                SolvedNode(const SolvedNode& sn) : cs(sn.cs), leftIdx(sn.leftIdx) {}
+                SolvedNode(SolvedNode&& sn) noexcept : cs(std::move(sn.cs)), leftIdx(std::move(sn.leftIdx)) {}
+
+                SolvedNode& operator=(const SolvedNode& other) {
+                    if (this != &other) {
+                        cs = other.cs;
+                        leftIdx = other.leftIdx;
+                    }
+                    return *this;
+                }
+
+                SolvedNode& operator=(SolvedNode&& other) noexcept {
+                    if (this != &other) {
+                        cs = std::move(other.cs);
+                        leftIdx = std::move(other.leftIdx);
+                    }
+                    return *this;
+                }
+            };
+
             struct Counter {
 
                 uint64_t solved;
@@ -97,19 +125,15 @@ namespace rei {
 
             bool AddSolvedNode(const CS& cs, int& idx);
 
-            bool InsertAndCheck(int parentIdx, CS left, CS right);
+            bool InsertAndCheck(int parentIdx, CS left, CS right, int& solutionIdx);
 
-            bool InsertAndCheck(int parentIdx, CS child);
+            bool InsertAndCheck(int parentIdx, CS child, int& solutionIdx);
 
-            // This is just temporary
-            bool CheckAllVisited(int& solvedIndex);
-
-            int GetLastOutmostParent();
+            int GetLastOutmostParent(int solutionIndex);
 
             CS* cache;
-            // 0 = the original node, -1 = given, < -1 = redirectIdx, > 1 = leftIdx
-            int* status; 
-            std::unordered_map<int, CS> idxToSolved;
+            int* nextVisited; 
+            std::unordered_map<int, SolvedNode> solved;
             // Index of the last free position in the language cache
             int lastIdx;
             Counter counter;
@@ -122,7 +146,9 @@ namespace rei {
 
             bool isSolved(int idx);
 
-            bool recursiveCheck(int index, int lcIdx);
+            bool checkVisited(int originalIdx, std::vector<int>& solvedIdx, int& solutionIdx);
+
+            bool recursiveCheck(int index, int lcIdx, std::vector<int>& solvedIdx );
 
             int getOutmostParent(int index);
 
