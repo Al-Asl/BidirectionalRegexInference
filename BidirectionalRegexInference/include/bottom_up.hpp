@@ -45,6 +45,8 @@ namespace rei {
 
         EnumerationState EnumerateCostLevel(BottomUpSearchResult& res);
 
+        uint64_t EstimateNextLevelCS();
+
         std::string ConstructRE(const CS& cs) const;
 
         std::span<CS> GetLastCostLevel() const;

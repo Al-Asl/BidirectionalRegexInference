@@ -91,14 +91,13 @@ Result RunBidirectional(const GuideTable& guideTable, const std::set<char>& alph
 
     // Bottom-Up
     int buCacheCapacity = 2000000;
-    int levels = 13;
     BottomUpSearchResult buRes = {};
 
     BottomUpSearch bottomUp(guideTable, alphabets, costs, maxCost, posBits, negBits, buCacheCapacity);
 
     // Top-Down
     int maxLevel = 50;
-    int tdCacheCapacity = 8000000;
+    int tdCacheCapacity = 2000000;
     TopDownSearchResult tdRes = {};
 
     TopDownSearch topDown(guideTable, std::make_shared<BottomUpResolver>(bottomUp), maxLevel, posBits, negBits, tdCacheCapacity);
@@ -113,26 +112,31 @@ Result RunBidirectional(const GuideTable& guideTable, const std::set<char>& alph
 
     // Search
     EnumerationState enumState;
-    int i = 0;
-    do {
-        enumState = bottomUp.EnumerateCostLevel(buRes);
-        if (enumState != EnumerationState::NotFound) break;
-        auto plevel = bottomUp.GetLastCostLevel();
-        for (const auto& cs : plevel)
-            topDown.Push(cs, tdRes);
-    } while (++i < levels);
+    bool topDownLast;
 
-    if (enumState == EnumerationState::Found)
-        return Result(buRes.RE, guideTable.ICsize, buRes.allREs);
+    while (true) {
+        topDownLast = topDown.EstimateNextLevelCS() < bottomUp.EstimateNextLevelCS();
 
-    do {
-        enumState = topDown.EnumerateLevel(tdRes);
-    } while (enumState == EnumerationState::NotFound);
+        if (topDownLast)
+            enumState = topDown.EnumerateLevel(tdRes);
+        else
+            enumState = bottomUp.EnumerateCostLevel(buRes);
 
-    if (enumState == EnumerationState::Found)
-        return Result(tdRes.RE, guideTable.ICsize, tdRes.allCS + buRes.allREs);
-    else
+        if (enumState != EnumerationState::NotFound)
+            break;
+
+        // sync
+        if (!topDownLast) {
+            auto plevel = bottomUp.GetLastCostLevel();
+            for (const auto& cs : plevel)
+                topDown.Push(cs, tdRes);
+        }
+    }
+
+    if (enumState == EnumerationState::End)
         return Result("not_found", guideTable.ICsize, tdRes.allCS + buRes.allREs);
+    else
+        return Result(topDownLast ? tdRes.RE : buRes.RE, guideTable.ICsize, tdRes.allCS + buRes.allREs);
 }
 
 rei::Result rei::Run(const unsigned short* costFun, const unsigned short maxCost,

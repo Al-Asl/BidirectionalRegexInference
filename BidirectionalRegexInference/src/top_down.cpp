@@ -9,7 +9,7 @@
 // the start index of the language cache
 #define LC_START 2
 
-#define NEXTDUPLICATE_GIVEN -1
+#define NEXTVISITED_GIVEN -1
 
 #define VISITED_SOLUTIONSET 1
 #define VISITED_GIVEN -1
@@ -41,7 +41,7 @@ void rei::TopDownSearch::Context::AddSolutionSet(const std::vector<CS>& solution
         visited[solutionSet[i]] = VISITED_SOLUTIONSET;
 }
 
-bool rei::TopDownSearch::Context::AddSolvedNode(const CS& cs, int& idx) {
+bool rei::TopDownSearch::Context::AddSolvedNode(const CS& cs, int& solutionIdx) {
     if (visited.find(cs) == visited.end())
     {
         visited[cs] = VISITED_GIVEN;
@@ -49,27 +49,71 @@ bool rei::TopDownSearch::Context::AddSolvedNode(const CS& cs, int& idx) {
     }
     else
     {
-        // replace in the graph and do the check!
+        auto idx = visited.at(cs);
+        idx = idx >= LC_START ? idx : -idx; // self solved nodes are also discarded because they are not minimum
+
+        //TODO: prune at idx first
+
+        // collect all visited
+        std::vector<int> toCheck;
+        toCheck.push_back(idx);
+        while (nextVisited[idx] >= LC_START)
+        {
+            toCheck.push_back(nextVisited[idx]);
+            idx = nextVisited[idx];
+        }
+
+        std::vector<int> solvedIdx;
+
+        // set all of them to solved
+        visited[cs] = VISITED_GIVEN;
+        for (int i = 0; i < toCheck.size(); i++)
+        {
+            cache[toCheck[i]]       = CS();
+            solved[toCheck[i]]      = SolvedNode(cs);
+            nextVisited[toCheck[i]] = NEXTVISITED_GIVEN;
+        }
+
+        // run check
+        for (int i = 0; i < toCheck.size(); i++)
+        {
+            if (checkSibling(toCheck[i], solvedIdx, solutionIdx))
+                return true;
+        }
+
+        for (int i = 0; i < solvedIdx.size(); i++)
+        {
+            if (checkVisited(solvedIdx[i], solvedIdx, solutionIdx))
+                return true;
+        }
+
         return false;
     }
 }
 
+bool rei::TopDownSearch::Context::checkSibling(int idx, std::vector<int>& solvedIdx, int& solutionIdx) {
+    auto sidx = idx % 2 == 0 ? idx + 1 : idx - 1;
+
+    if (!isSolved(sidx))
+        return false;
+
+    if (parentIdx[idx] == PARENTIDX_SOLUTIONSET ? true : recursiveCheck(parentIdx[idx], idx < sidx ? idx : sidx, solvedIdx))
+    {
+        solutionIdx = getOutmostParent(idx);
+        return true;
+    }
+
+    return false;
+}
+
 bool rei::TopDownSearch::Context::checkVisited(int originalIdx, std::vector<int>& solvedIdx, int& solutionIdx) {
 
-    auto idx = originalIdx;
-    while (nextVisited[idx] >= LC_START)
+    auto idx = nextVisited[originalIdx];
+    while (idx >= LC_START)
     {
-        idx = nextVisited[idx];
-        auto sidx = idx % 2 == 0 ? idx + 1 : idx - 1;
-
-        if (!isSolved(sidx))
-            continue;
-
-        if (parentIdx[idx] == PARENTIDX_SOLUTIONSET ? true : recursiveCheck(parentIdx[idx], idx < sidx ? idx : sidx, solvedIdx))
-        {
-            solutionIdx = getOutmostParent(idx);
+        if (checkSibling(idx, solvedIdx, solutionIdx))
             return true;
-        }
+        idx = nextVisited[idx];
     }
 
     return false;
@@ -175,7 +219,7 @@ void rei::TopDownSearch::Context::insert(NodeType nodeType, CS cs, int pIdx)
         solved[lastIdx] = SolvedNode(cs);
         break;
     case NodeType::Given:
-        nextVisited[lastIdx] = NEXTDUPLICATE_GIVEN;
+        nextVisited[lastIdx] = NEXTVISITED_GIVEN;
         solved[lastIdx] = SolvedNode(cs);
         break;
     }
@@ -186,7 +230,7 @@ void rei::TopDownSearch::Context::insert(NodeType nodeType, CS cs, int pIdx)
 bool rei::TopDownSearch::Context::isSolved(int idx) {
 
     auto nextIdx = nextVisited[idx];
-    if (nextIdx == NEXTDUPLICATE_GIVEN) return true;
+    if (nextIdx == NEXTVISITED_GIVEN) return true;
     return solved.find(getOriginal(nextVisited, nextIdx)) != solved.end();
 }
 
@@ -231,10 +275,12 @@ rei::TopDownSearch::TopDownSearch(const rei::GuideTable& guideTable,
 }
 
 bool rei::TopDownSearch::Push(const CS& cs, TopDownSearchResult& res) {
-    int idx;
-    if (context.AddSolvedNode(cs, idx))
+    int solutionIndex;
+    if (context.AddSolvedNode(cs, solutionIndex))
     {
-        // reconstruct the RE
+        auto idx = context.GetLastOutmostParent(solutionIndex);
+        res.RE = constructDownward(idx);
+        res.allCS = context.lastIdx - LC_START;
         return true;
     }
     else
@@ -273,11 +319,28 @@ EnumerationState rei::TopDownSearch::EnumerateLevel(TopDownSearchResult& res)
     {
         if (enumState == EnumerationState::Found)
             res.RE = constructDownward(solved);
-        res.allCS = context.lastIdx;
+        res.allCS = context.lastIdx - LC_START;
     }
 
     level++;
     return enumState;
+}
+
+uint64_t rei::TopDownSearch::EstimateNextLevelCS()
+{
+    if(!(heuristicConfigs.solutionSetUseRandomSampling && heuristicConfigs.invertStarUseRandomSampling &&
+        heuristicConfigs.invertConcatUseRandomSampling && heuristicConfigs.invertOrUseRandomSampling))
+        throw std::invalid_argument("All heuristic need to be enabled before calling EstimateNextLevelCS");
+
+    uint64_t multi = 1 + heuristicConfigs.invertStarMaxSamples + 2 * heuristicConfigs.invertConcatMaxSamples + 2 * heuristicConfigs.invertOrMaxSamples;
+
+    if (level == 0)
+        return multi * heuristicConfigs.solutionSetMaxSamples;
+    else
+    {
+        auto [start, end] = partitioner.Interval(level - 1);
+        return multi * (end - start);
+    }
 }
 
 void rei::TopDownSearch::SetHeuristic(HeuristicConfigs configs)
@@ -503,7 +566,7 @@ std::string rei::TopDownSearch::bracket(std::string s) {
 std::string rei::TopDownSearch::constructDownward(int index)
 {
     std::string left;
-    if (context.nextVisited[index] == NEXTDUPLICATE_GIVEN)
+    if (context.nextVisited[index] == NEXTVISITED_GIVEN)
         left = resolver->resolve(context.solved.at(index).cs);
     else
     {
@@ -532,7 +595,7 @@ std::string rei::TopDownSearch::constructDownward(int index)
     }
 
     std::string right;
-    if (context.nextVisited[++index] == NEXTDUPLICATE_GIVEN)
+    if (context.nextVisited[++index] == NEXTVISITED_GIVEN)
         right = resolver->resolve(context.solved.at(index).cs);
     else
     {

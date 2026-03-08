@@ -123,7 +123,7 @@ namespace rei {
 
             void AddSolutionSet(const std::vector<CS>& solutionSet);
 
-            bool AddSolvedNode(const CS& cs, int& idx);
+            bool AddSolvedNode(const CS& cs, int& solutionIdx);
 
             bool InsertAndCheck(int parentIdx, CS left, CS right, int& solutionIdx);
 
@@ -146,6 +146,8 @@ namespace rei {
 
             bool isSolved(int idx);
 
+            bool checkSibling(int originalIdx, std::vector<int>& solvedIdx, int& solutionIdx);
+
             bool checkVisited(int originalIdx, std::vector<int>& solvedIdx, int& solutionIdx);
 
             bool recursiveCheck(int index, int lcIdx, std::vector<int>& solvedIdx );
@@ -164,6 +166,8 @@ namespace rei {
         bool Push(const CS& cs, TopDownSearchResult& res);
 
         EnumerationState EnumerateLevel(TopDownSearchResult& res);
+
+        uint64_t EstimateNextLevelCS();
 
         void SetHeuristic(HeuristicConfigs heuristicConfigs);
 

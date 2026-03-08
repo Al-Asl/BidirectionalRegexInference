@@ -93,6 +93,51 @@ rei::EnumerationState rei::BottomUpSearch::EnumerateCostLevel(BottomUpSearchResu
 
 }
 
+uint64_t rei::BottomUpSearch::EstimateNextLevelCS() {
+
+    uint64_t count = 0;
+
+    bool useQuestionOverOr = costs.alpha + costs.alternation >= costs.question;
+
+    //Question Mark
+    if (costLevel >= costs.alpha + costs.question && useQuestionOverOr) {
+        // ignore results from (*) and (?)
+        auto [start, end] = partitioner.Interval(costLevel - costs.star, static_cast<Operation>(2));
+        count += (end - start);
+    }
+
+    if (costLevel >= costs.alpha + costs.star) {
+        // ignore results from (*) and (?)
+        auto [start, end] = partitioner.Interval(costLevel - costs.star, static_cast<Operation>(2));
+        count += (end - start);
+    }
+
+    //Concatenate
+    for (int i = costs.alpha; 2 * i <= costLevel - costs.concat; ++i) {
+
+        auto [lstart, lend] = partitioner.Interval(i);
+        auto [rstart, rend] = partitioner.Interval(costLevel - i - costs.concat);
+
+        count += 2 * (lend - lstart) * (rend - rstart);
+    }
+
+    //Union
+    if (!useQuestionOverOr && costLevel >= 2 * costs.alpha + costs.alternation) {
+
+        auto [start, end] = partitioner.Interval(costLevel - costs.alpha - costs.alternation);
+        count += (end - start);
+    }
+    for (int i = costs.alpha; 2 * i <= costLevel - costs.alternation; ++i) {
+
+        auto [lstart, lend] = partitioner.Interval(i);
+        auto [rstart, rend] = partitioner.Interval(costLevel - i - costs.alternation);
+
+        count += (lend - lstart) * (rend - rstart);
+    }
+
+    return count;
+}
+
 std::string rei::BottomUpSearch::ConstructRE(const CS& cs) const {
     auto idx = context.visited.at(cs);
     if (idx == -1) return std::string("eps");
