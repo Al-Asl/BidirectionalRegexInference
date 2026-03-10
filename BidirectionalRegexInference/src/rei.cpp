@@ -129,7 +129,19 @@ Result RunBidirectional(const GuideTable& guideTable, const std::set<char>& alph
         if (!topDownLast) {
             auto plevel = bottomUp.GetLastCostLevel();
             for (const auto& cs : plevel)
-                topDown.Push(cs, tdRes);
+            {
+                if (topDown.Push(cs, tdRes))
+                {
+                    enumState = EnumerationState::Found;
+                    break;
+                }
+            }
+
+            if (enumState != EnumerationState::NotFound)
+            {
+                topDownLast = true;
+                break;
+            }
         }
     }
 
@@ -159,5 +171,5 @@ rei::Result rei::Run(const unsigned short* costFun, const unsigned short maxCost
 
     //return RunTopDown(guideTable, alphabets, costs, 50, posBits, negBits, 20000000);
 
-    return RunBidirectional(guideTable, alphabets, costs, maxCost, posBits, negBits, 64);
+    return RunBidirectional(guideTable, alphabets, costs, maxCost, posBits, negBits, 16);
 }

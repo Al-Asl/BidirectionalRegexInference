@@ -27,6 +27,7 @@ rei::TopDownSearch::Context::Context(int cache_capacity)
     lastIdx = 0;
     allCS = 0;
     counter = {};
+    level = 0;
 }
 
 rei::TopDownSearch::Context::~Context()
@@ -91,10 +92,24 @@ bool rei::TopDownSearch::Context::AddSolvedNode(const CS& cs, int& solutionIdx) 
     }
 }
 
+int rei::TopDownSearch::Context::getNodeHeight(int idx)
+{
+    int pIdx = idx;
+    int depth = -1;
+    do {
+        pIdx = parentIdx[pIdx];
+        depth++;
+    } while (pIdx != PARENTIDX_SOLUTIONSET);
+
+    return level - depth;
+}
+
 bool rei::TopDownSearch::Context::checkSibling(int idx, std::vector<int>& solvedIdx, int& solutionIdx) {
     auto sidx = idx % 2 == 0 ? idx + 1 : idx - 1;
 
-    if (!isSolved(sidx))
+    auto [sIdxSolved, sIdxDepth] = isSolved(sidx);
+
+    if (!sIdxSolved || sIdxDepth > getNodeHeight(idx))
         return false;
 
     if (parentIdx[idx] == PARENTIDX_SOLUTIONSET ? true : recursiveCheck(parentIdx[idx], idx < sidx ? idx : sidx, solvedIdx))
@@ -227,34 +242,43 @@ void rei::TopDownSearch::Context::insert(NodeType nodeType, CS cs, int pIdx)
     parentIdx[lastIdx++] = pIdx;
 }
 
-bool rei::TopDownSearch::Context::isSolved(int idx) {
+std::tuple<bool,int> rei::TopDownSearch::Context::isSolved(int idx) {
 
     auto nextIdx = nextVisited[idx];
-    if (nextIdx == NEXTVISITED_GIVEN) return true;
-    return solved.find(getOriginal(nextVisited, nextIdx)) != solved.end();
+    if (nextIdx == NEXTVISITED_GIVEN) return { true, 0 };
+    auto snIt = solved.find(getOriginal(nextVisited, nextIdx));
+    if (snIt == solved.end())
+        return { false, 0 };
+    else
+        return { true,  (*snIt).second.depth };
 }
 
-bool rei::TopDownSearch::Context::recursiveCheck(int index, int lcIdx, std::vector<int>& solvedIdx)
+bool rei::TopDownSearch::Context::recursiveCheck(int index, int lcIdx, std::vector<int>& solvedIdx) {
+    return recursiveCheck(index, lcIdx, 1, solvedIdx);
+}
+
+bool rei::TopDownSearch::Context::recursiveCheck(int index, int lcIdx, int height, std::vector<int>& solvedIdx)
 {
     // this is important because there is now way to protect against cyclic nodes
-    if (isSolved(index)) return false;
+    if (std::get<0>(isSolved(index))) return false;
 
     // we can reconstruct the cs recursively, we don't need cache
     visited[cache[index]] = -index;
-    solved[index] = SolvedNode(cache[index], lcIdx);
+    solved[index] = SolvedNode(cache[index], lcIdx, height);
     solvedIdx.push_back(index);
 
     counter.solved++;
 
     int pIdx = parentIdx[index];
     int sIdx = index % 2 == 0 ? index + 1 : index - 1;
+    auto [sIdxSolved, sIdxDepth] = isSolved(sIdx);
 
-    if (!isSolved(sIdx)) return false;
+    if (!sIdxSolved || sIdxDepth > height ) return false;
 
     if (pIdx == PARENTIDX_SOLUTIONSET)
         return true;
 
-    return recursiveCheck(pIdx, index < sIdx ? index : sIdx, solvedIdx);
+    return recursiveCheck(pIdx, index < sIdx ? index : sIdx, height + 1, solvedIdx);
 }
 
 int rei::TopDownSearch::Context::getOutmostParent(int index) {
@@ -323,6 +347,7 @@ EnumerationState rei::TopDownSearch::EnumerateLevel(TopDownSearchResult& res)
     }
 
     level++;
+    context.level++;
     return enumState;
 }
 

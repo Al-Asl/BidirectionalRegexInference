@@ -59,19 +59,21 @@ namespace rei {
 
             struct SolvedNode {
                 int leftIdx;
+                int depth;
                 CS cs;
 
-                SolvedNode() : cs(CS()), leftIdx(0) {}
-                SolvedNode(const CS& cs, int leftIdx) : cs(cs), leftIdx(leftIdx) {}
-                SolvedNode(const CS& cs) : cs(cs), leftIdx(0) {}
+                SolvedNode() : cs(CS()), leftIdx(0), depth(0) {}
+                SolvedNode(const CS& cs, int leftIdx, int depth) : cs(cs), leftIdx(leftIdx), depth(depth) {}
+                SolvedNode(const CS& cs) : cs(cs), leftIdx(0), depth(0) {}
 
-                SolvedNode(const SolvedNode& sn) : cs(sn.cs), leftIdx(sn.leftIdx) {}
-                SolvedNode(SolvedNode&& sn) noexcept : cs(std::move(sn.cs)), leftIdx(std::move(sn.leftIdx)) {}
+                SolvedNode(const SolvedNode& sn) : cs(sn.cs), leftIdx(sn.leftIdx), depth(sn.depth) {}
+                SolvedNode(SolvedNode&& sn) noexcept : cs(std::move(sn.cs)), leftIdx(std::move(sn.leftIdx)), depth(std::move(sn.depth)) {}
 
                 SolvedNode& operator=(const SolvedNode& other) {
                     if (this != &other) {
                         cs = other.cs;
                         leftIdx = other.leftIdx;
+                        depth = other.depth;
                     }
                     return *this;
                 }
@@ -80,6 +82,7 @@ namespace rei {
                     if (this != &other) {
                         cs = std::move(other.cs);
                         leftIdx = std::move(other.leftIdx);
+                        depth = std::move(other.depth);
                     }
                     return *this;
                 }
@@ -138,17 +141,23 @@ namespace rei {
             int lastIdx;
             Counter counter;
             uint64_t allCS;
+            int level;
 
         private:
             NodeType getNodeType(const CS& cs);
 
             void insert(NodeType nodeType, CS cs, int pIdx);
 
-            bool isSolved(int idx);
+            int getNodeHeight(int idx);
+
+            //return the depth as well
+            std::tuple<bool, int> isSolved(int idx);
 
             bool checkSibling(int originalIdx, std::vector<int>& solvedIdx, int& solutionIdx);
 
             bool checkVisited(int originalIdx, std::vector<int>& solvedIdx, int& solutionIdx);
+
+            bool recursiveCheck(int index, int lcIdx, int height, std::vector<int>& solvedIdx);
 
             bool recursiveCheck(int index, int lcIdx, std::vector<int>& solvedIdx );
 
