@@ -13,6 +13,7 @@ namespace rei {
         ~LevelPartitioner();
 
         std::tuple<int, int> Interval(int level, Operation start = Operation::Question, Operation end = Operation::Or) const;
+        int intervalSize(int level, Operation start = Operation::Question, Operation end = Operation::Or) const;
 
         int& start(int level, Operation op);
         int start(int level, Operation op) const;
@@ -20,12 +21,15 @@ namespace rei {
         int& end(int level, Operation op);
         int end(int level, Operation op) const;
 
-        void indexToLevel(int index, int& level, Operation& op) const;
+        void fillTo(int level, int value);
+
+        std::pair<int,Operation> indexToLevel(int index) const;
 
     private:
 
         int* startPoints;
-        int opCount;
+        unsigned short opCount;
+        unsigned short maxCost;
     };
 }
 

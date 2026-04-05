@@ -1,7 +1,7 @@
 #ifndef BOTTOM_UP_HPP
 #define BOTTOM_UP_HPP
 
-#include <span>
+#include <unordered_set>
 
 #include <rei_common.hpp>
 
@@ -11,7 +11,7 @@ namespace rei {
     public:
         int cost;
         std::string RE;
-        int allREs;
+        int allCS;
     };
 
     class BottomUpSearch
@@ -19,54 +19,48 @@ namespace rei {
         class Context
         {
         public:
-            Context(int cache_capacity, const CS& posBits, const CS& negBits);
-
+            Context(int cache_capacity, int n, const CS& posBits, const CS& negBits);
             ~Context();
 
-            bool InsertAndCheck(CS CS, int index);
+            bool insertAndCheck(CS CS, int index);
+            bool insertAndCheck(CS CS, int lIndex, int rIndex);
+            CSBuffer getCacheSlice(int start, int end);
 
-            bool InsertAndCheck(CS CS, int lIndex, int rIndex);
-
-            std::span<CS> GetCacheSlice(int start, int end);
+            unsigned long allREs;
+            bool onTheFly;
 
             int* leftRightIdx;
-            unsigned long allREs;
-            int lastIdx; // Index of the last free position in the language cache
-            bool onTheFly;
-            int cache_capacity;
+            CSBuffer cache;
+            std::unordered_set<uint64_t> visited;
 
-            CS* cache;
-            std::unordered_map<CS, int> visited;
-            const CS& posBits, negBits;
+            const CS posBits, negBits;
         };
 
     public:
-        BottomUpSearch(const GuideTable& guideTable, const std::set<char>& alphabets, const Costs& costs, const unsigned short maxCost, const CS& posBits, const CS& negBits, int cache_capacity);
+        BottomUpSearch(const GuideTable& guideTable, const std::set<char>& alphabets, const Costs& costs, 
+            const unsigned short maxCost, const CS& posBits, const CS& negBits, int cache_capacity);
 
-        EnumerationState EnumerateCostLevel(BottomUpSearchResult& res);
+        EnumerationState enumerateCostLevel(BottomUpSearchResult& res);
+        uint64_t estimateNextLevel();
 
-        uint64_t EstimateNextLevelCS();
-
-        std::string ConstructRE(const CS& cs) const;
-
-        std::span<CS> GetLastCostLevel() const;
+        std::vector<int> getLastCostLevel(int& cost);
+        std::string constructRE(int idx) const;
+        const CS getCS(int id) const;
 
     private:
+
         // Adding parentheses if needed
         std::string bracket(std::string s) const;
-
         // Generating the final RE string recursively
         std::string constructDownward(int index) const;
 
         EnumerationState enumerateLevel(int& idx);
 
-        int costLevel;
-        int shortageCost;
-        bool lastRound;
+        unsigned short costLevel;
+        unsigned short shortageCost;
         const unsigned short maxCost;
+        bool lastRound;
 
-        const CS& posBits;
-        const CS& negBits;
         const Costs& costs;
         const rei::GuideTable& guideTable;
         const std::set<char>& alphabet;

@@ -18,70 +18,61 @@ namespace rei
 
     std::string to_string(Operation op);
 
-    inline CS processQuestion(const CS& cs) {
-        return cs | CS::one();
+    inline void processQuestion(CS& cs) {
+        cs.setBitOn(0);
     }
 
-    inline CS processStar(const GuideTable& guideTable, const CS& cs) {
+    inline void processStar(const GuideTable& guideTable, CS& cs) {
 
-        auto res = cs | CS::one();
+        cs.setBitOn(0);
         int ix = guideTable.alphabetSize + 1;
-        CS c = CS::one() << ix;
 
         while (ix < guideTable.ICsize)
         {
-            if (!(res & c)) {
-                for (auto [left, right] : guideTable.IterateRow(ix)) {
-                    if (((CS::one() << left) & res) && ((CS::one() << right) & res)) { res |= c; break; }
+            if (!cs.getBit(ix)) {
+                for (auto [left, right] : guideTable.iterateSplits(ix)) {
+                    if (cs.getBit(left) && cs.getBit(right)) { cs.setBitOn(ix); break; }
                 }
             }
-            c <<= 1; ix++;
+            ix++;
         }
-
-        return res;
     }
 
-    inline CS processConcatenate(const GuideTable& guideTable, const CS& left, const CS& right) {
+    inline void processConcatenate(const GuideTable& guideTable, const CS& left, const CS& right, CS& res) {
 
-        CS cs1 = CS();
-        if (left & CS::one()) cs1 |= right;
-        if (right & CS::one()) cs1 |= left;
+        if (left.getBit(0)) res |= right;
+        if (right.getBit(0)) res |= left;
 
         int ix = guideTable.alphabetSize + 1;
-        CS c = CS::one() << ix;
 
         while (ix < guideTable.ICsize)
         {
             // when CS have value that means one of parts contains phi, check above
-            if (!(cs1 & c)) {
-                for (auto [l, r] : guideTable.IterateRow(ix))
-                    if (((CS::one() << l) & left) && ((CS::one() << r) & right)) { cs1 |= c; break; }
+            if (!res.getBit(ix)) {
+                for (auto [l, r] : guideTable.iterateSplits(ix))
+                    if (left.getBit(l) && right.getBit(r)) { res.setBitOn(ix); break; }
             }
-
-            c <<= 1; ix++;
+            ix++;
         }
-
-        return cs1;
     }
 
-    inline CS processOr(const CS& left, const CS& right) {
-        return left | right;
+    inline void processOr(const CS& left, const CS& right, CS& res) {
+        res |= left;
+        res |= right;
     }
 
-    std::vector<CS> revertQuestion(const CS& cs);
+    // ========================================================================
 
-    std::vector<CS> revertStarRandom(const CS& cs, size_t maxSamples, const GuideTable& guideTable, uint64_t seed = std::random_device{}());
+    void revertStarRandom(const GuideTable& guideTable, const CS& cs, CSBuffer& buffer, uint64_t seed = std::random_device{}());
     // revert with brute force
-    std::vector<CS> revertStarBrute(const GuideTable& guideTable, const CS& target);
-    std::vector<CS> revertStar(const CS& cs, const GuideTable& guideTable);
+    void revertStarBrute(const GuideTable& guideTable, const CS& target, CSBuffer& buffer);
+    void revertStar(const GuideTable& guideTable, const CS& cs, CSBuffer& buffer);
 
-    std::vector<Pair<CS>> revertConcatRandom(const CS& cs, size_t maxSamples, const GuideTable& guideTable, uint64_t seed = std::random_device{}());
-    // revert with brute force
-    std::vector<Pair<CS>> revertConcatBrute(const CS& target, const GuideTable& guideTable);
-    std::vector<Pair<CS>> revertConcat(const CS& cs, const GuideTable& guideTable);
+    void revertConcatRandom(const rei::GuideTable& guideTable, const CS& cs, CSBuffer& buffer, uint64_t seed = std::random_device{}(), bool enhanceCount = true);
+    void revertConcat(const GuideTable& guideTable, const CS& cs, CSBuffer& buffer);
 
-    std::vector<Pair<CS>> revertOrRandom(const CS& cs, size_t maxSamples, int ICsize, uint64_t seed = std::random_device{}());
-    vector<Pair<CS>> revertOr(const CS& cs);
+    void revertOrRandom(const CS& cs, CSBuffer& buffer, uint64_t seed = std::random_device{}());
+    void revertOr(const CS& cs, CSBuffer& buffer);
 }
 
 #endif // OPERATIONS_H

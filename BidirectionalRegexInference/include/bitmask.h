@@ -11,425 +11,416 @@
 template <class T>
 using Pair = rei::Pair<T>;
 
-#define HD
+#define RELAX_UNIQUENESS_CHECK_TYPE 2
 
 namespace rei
 {
-    /// <summary>
-    /// bitmask template implementation, work on both host and device and implement (RUC), the number of bits is N*64
-    /// </summary>
-    template <int N>
-    struct bitmask {
+    template <typename T>
+    struct BitmaskView {
+    public:
 
-        HD bitmask(const uint64_t(&input)[N]) {
-            for (size_t i = 0; i < N; ++i) {
-                data[i] = input[i];
+        static int getChuncksSize(int bitsSize) {
+            return (bitsSize - 1) / (sizeof(T) * 8) + 1;
+        }
+
+        static constexpr int chunckBitSize = sizeof(T) * 8;
+
+        BitmaskView(T* ptr, int size) : ptr(ptr) , size(size) { }
+
+        BitmaskView static createInvalid() { return BitmaskView(nullptr, 0); }
+
+        bool isValid() const { return ptr != nullptr; }
+
+        BitmaskView& setChunck(T value, int idx) {
+            ptr[idx] = value;
+            return *this;
+        }
+
+        uint64_t getChunck(int idx) const {
+            return ptr[idx];
+        }
+
+        BitmaskView& toggleBit(int bitIndex) {
+            int eIdx = bitIndex / chunckBitSize;
+            int bIdx = bitIndex % chunckBitSize;
+            ptr[eIdx] ^= (1ULL << bIdx);
+            return *this;
+        }
+
+        BitmaskView& setBitOn(int bitIndex) {
+            int eIdx = bitIndex / chunckBitSize;
+            int bIdx = bitIndex % chunckBitSize;
+            ptr[eIdx] |= (1ULL << bIdx);
+            return *this;
+        }
+
+        BitmaskView& setBitOff(int bitIndex) {
+            int eIdx = bitIndex / chunckBitSize;
+            int bIdx = bitIndex % chunckBitSize;
+            ptr[eIdx] &= ~(1ULL << bIdx);
+            return *this;
+        }
+
+        bool getBit(int bitIndex) const {
+            int eIdx = bitIndex / chunckBitSize;
+            int bIdx = bitIndex % chunckBitSize;
+            return (ptr[eIdx] >> bIdx) & 1ULL;
+        }
+
+        BitmaskView& operator|=(const BitmaskView& other) {
+            for (int i = 0; i < size; i++) {
+                ptr[i] |= other.ptr[i];
             }
+            return *this;
         }
 
-        HD bitmask() {
-            for (size_t i = 0; i < N; ++i) {
-                data[i] = 0;
+        BitmaskView& operator&=(const BitmaskView& other) {
+            for (int i = 0; i < size; i++) {
+                ptr[i] &= other.ptr[i];
             }
+            return *this;
         }
 
-        HD bitmask(const bitmask& other) {
-            for (size_t i = 0; i < N; ++i)
-                data[i] = other.data[i];
-        }
-
-        HD bitmask(bitmask&& other) noexcept {
-            for (size_t i = 0; i < N; ++i)
-                data[i] = other.data[i];
-            for (size_t i = 0; i < N; ++i) other.data[i] = 0;
-        }
-
-        HD static bitmask all() {
-            uint64_t vals[N];
-            for (size_t i = 0; i < N; ++i) {
-                vals[i] = (uint64_t)-1;
+        inline bool intersects(const BitmaskView& other) const {
+            for (int i = 0; i < size; ++i) {
+                if ((ptr[i] & other.ptr[i]) != 0) {
+                    return true;
+                }
             }
-            return bitmask(vals);
+            return false;
         }
 
-        HD static bitmask one() {
-            uint64_t vals[N] = {};
-            vals[0] = 1;
-            return bitmask(vals);
+        BitmaskView& operator^=(const BitmaskView& other) {
+            for (int i = 0; i < size; i++) {
+                ptr[i] ^= other.ptr[i];
+            }
+            return *this;
         }
 
-        HD static bitmask fromLow(uint64_t lowBits) {
-            uint64_t vals[N] = {};
-            vals[0] = lowBits;
-            return bitmask(vals);
+        bool containsAll(const BitmaskView& other) const {
+            for (int i = 0; i < size; i++) {
+                if ((ptr[i] & other.ptr[i]) != other.ptr[i]) {
+                    return false;
+                }
+            }
+            return true;
         }
 
-        HD Pair<uint64_t> get128Hash() const {
+        bool containsNone(const BitmaskView& other) const {
+            for (int i = 0; i < size; i++) {
+                if ((ptr[i] & other.ptr[i]) != 0) {
+                    return false;
+                }
+            }
+            return true;
+        }
 
-            if (N == 2) 
-            { return { data[1], data[0] }; }
+        bool isEmpty() const {
+            for (int i = 0; i < size; i++) {
+                if (ptr[i])
+                    return false;
+            }
+            return true;
+        }
+
+        Pair<uint64_t> getHash128() const {
+
+            if (size == 2)
+            {
+                return {ptr[0], ptr[1]};
+            }
 
             uint64_t lCS = 0, hCS = 0;
 #if RELAX_UNIQUENESS_CHECK_TYPE == 0
-            const int stride = (N * 64) / 126;
+            const int stride = (size * 64) / 126;
 
             int j = 0;
-            for (int i = 0; i < N; ++i) {
+            for (int i = 0; i < size; ++i) {
                 for (int k = 0; k < 64; k += stride, ++j) {
                     if (j < 63) {
-                        if (data[i] & ((uint64_t)1 << k)) lCS |= (uint64_t)1 << j;
+                        if (ptr[i] & ((uint64_t)1 << k)) lCS |= (uint64_t)1 << j;
                     }
                     else if (j < 126) {
-                        if (data[i] & ((uint64_t)1 << k)) hCS |= (uint64_t)1 << (j - 63);
+                        if (ptr[i] & ((uint64_t)1 << k)) hCS |= (uint64_t)1 << (j - 63);
                     }
                     else break;
                 }
             }
 #elif RELAX_UNIQUENESS_CHECK_TYPE == 1
             int j = 0;
-            for (int i = 0; i < N; ++i) {
+            for (int i = 0; i < size; ++i) {
                 uint64_t bitPtr = 1;
-                int maxbitsForThisTrace = (126 * 64 + 64 * N) / 64 * N;
+                int maxbitsForThisTrace = (126 * 64 + 64 * size) / 64 * size;
                 for (int k = 0; k < maxbitsForThisTrace; ++k, ++j, bitPtr <<= 1) {
                     if (j < 63) {
-                        if (data[i] & bitPtr) lCS |= (uint64_t)1 << j;
+                        if (ptr[i] & bitPtr) lCS |= (uint64_t)1 << j;
                     }
                     else if (j < 126) {
-                        if (data[i] & bitPtr) hCS |= (uint64_t)1 << (j - 63);
+                        if (ptr[i] & bitPtr) hCS |= (uint64_t)1 << (j - 63);
                     }
                     else break;
                 }
             }
 #elif RELAX_UNIQUENESS_CHECK_TYPE == 2
-            for (int i = 0; i < N; ++i) {
-                uint64_t x = data[i];
+            for (int i = 0; i < size; ++i) {
+                uint64_t x = ptr[i];
                 x = (x ^ (x >> 30)) * UINT64_C(0xbf58476d1ce4e5b9);
                 x = (x ^ (x >> 27)) * UINT64_C(0x94d049bb133111eb);
                 x = x ^ (x >> 31);
-                if (i < N / 2) hCS ^= x; else lCS ^= x;
+                if (i < size / 2) hCS ^= x; else lCS ^= x;
             }
 #else
             int j = 0;
-            for (int i = 0; i < N; ++i) {
+            for (int i = 0; i < size; ++i) {
                 uint64_t bitPtr = 1;
                 for (int k = 0; k < 64; ++k, ++j, bitPtr <<= 1) {
                     if (j < 63) {
-                        if (data[i] & bitPtr) lCS |= (uint64_t)1 << j;
+                        if (ptr[i] & bitPtr) lCS |= (uint64_t)1 << j;
                     }
                     else if (j < 126) {
-                        if (data[i] & bitPtr) hCS |= (uint64_t)1 << (j - 63);
+                        if (ptr[i] & bitPtr) hCS |= (uint64_t)1 << (j - 63);
                     }
                     else break;
                 }
             }
 #endif
 
-            return { hCS, lCS };
+            return { lCS, hCS };
         }
 
-        HD bitmask& operator=(const bitmask& other) {
-            if (this != &other)
-                for (size_t i = 0; i < N; ++i) data[i] = other.data[i];
+        uint64_t getHash() const {
+
+            if (size == 1)
+                return std::hash<uint64_t>{}(ptr[0]);
+
+            auto [low, high] = getHash128();
+
+            std::size_t h1 = std::hash<uint64_t>{}(low);
+            std::size_t h2 = std::hash<uint64_t>{}(high);
+            return h1 ^ (h2 << 1);
+        }
+
+        void copyTo(uint64_t* destBuffer) const {
+            std::memcpy(destBuffer, ptr, size * sizeof(uint64_t));
+        }
+
+        void copyTo(BitmaskView& bitmask) const {
+            std::memcpy(bitmask.ptr, ptr, size * sizeof(uint64_t));
+        }
+
+        BitmaskView& copy(const uint64_t* destBuffer) {
+            std::memcpy(ptr, destBuffer, size * sizeof(uint64_t));
             return *this;
         }
 
-        HD bitmask& operator=(bitmask&& other) noexcept {
-            if (this != &other)
-                for (size_t i = 0; i < N; ++i) data[i] = other.data[i];
+        BitmaskView& copy(const BitmaskView& bitmask) {
+            std::memcpy(ptr, bitmask.ptr, size * sizeof(uint64_t));
             return *this;
         }
 
-        HD bitmask operator|(const bitmask& solved) const {
-            uint64_t vals[N];
-            for (size_t i = 0; i < N; ++i) {
-                vals[i] = data[i] | solved.data[i];
-            }
-            return bitmask(vals);
-        }
-
-        HD bitmask& operator|=(const bitmask& solved) {
-            for (size_t i = 0; i < N; ++i) {
-                data[i] |= solved.data[i];
-            }
+        BitmaskView& clear() {
+            std::fill(ptr, ptr + size, 0);
             return *this;
         }
 
-        HD bitmask operator^(const bitmask& solved) const {
-            uint64_t vals[N];
-            for (size_t i = 0; i < N; ++i) {
-                vals[i] = data[i] ^ solved.data[i];
-            }
-            return bitmask(vals);
+        uint64_t popCount() const {
+            uint64_t pc{};
+            for (size_t i = 0; i < size; i++)
+                pc += std::popcount(ptr[i]);
+            return pc;
         }
 
-        HD bitmask& operator^=(const bitmask& solved) {
-            for (size_t i = 0; i < N; ++i) {
-                data[i] ^= solved.data[i];
-            }
-            return *this;
-        }
+        std::vector<int> getBits() const {
+            std::vector<int> res;
 
-        HD bitmask operator&(const bitmask& solved) const {
-            uint64_t vals[N];
-            for (size_t i = 0; i < N; ++i) {
-                vals[i] = data[i] & solved.data[i];
-            }
-            return bitmask(vals);
-        }
+            for (int chunckIdx = 0; chunckIdx < size; ++chunckIdx) {
+                uint64_t chunk = ptr[chunckIdx];
 
-        HD bitmask& operator&=(const bitmask& solved) {
-            for (size_t i = 0; i < N; ++i) {
-                data[i] &= solved.data[i];
-            }
-            return *this;
-        }
+                if (chunk == 0) continue;
 
-        HD bitmask operator<<(const int shift) const {
-            uint64_t vals[N] = {};
-
-            if (shift < 0) {
-                return *this >> (-shift);
-            }
-
-            const int bits = 64;
-            int wordShift = shift / bits;
-            int bitShift = shift % bits;
-
-            for (size_t i = 0; i < N; ++i) {
-                if (i + wordShift >= N) break;
-
-                vals[i + wordShift] |= data[i] << bitShift;
-
-                if (bitShift != 0 && (i + wordShift + 1) < N) {
-                    vals[i + wordShift + 1] |= data[i] >> (bits - bitShift);
+                for (int bitIdx = 0; bitIdx < chunckBitSize; ++bitIdx) {
+                    if (chunk & (1ULL << bitIdx))
+                        res.push_back(chunckIdx * 64 + bitIdx);
                 }
             }
 
-            return bitmask(vals);
+            return res;
         }
-        HD bitmask& operator<<=(int shift) {
 
-            if (shift < 0) {
-                return *this >>= -shift;
+        BitmaskView& invert(){
+            for (int i = 0; i < size; ++i) {
+                ptr[i] = ~ptr[i];
             }
-
-            const int bits = 64;
-            int wordShift = shift / bits;
-            int bitShift = shift % bits;
-
-            if (wordShift >= N) {
-                for (int i = 0; i < N; ++i) data[i] = 0;
-                return *this;
-            }
-
-            for (int i = N - 1; i >= wordShift; --i) {
-                data[i] = data[i - wordShift];
-            }
-            for (int i = wordShift - 1; i >= 0; --i) {
-                data[i] = 0;
-            }
-
-            if (bitShift > 0) {
-                for (int i = N - 1; i > 0; --i) {
-                    data[i] <<= bitShift;
-                    data[i] |= data[i - 1] >> (bits - bitShift);
-                }
-                data[0] <<= bitShift;
-            }
-
             return *this;
         }
 
-        HD bitmask operator>>(const int shift) const {
-
-            uint64_t vals[N] = {};
-
-            if (shift < 0) {
-                return *this << (-shift);
+        bool operator==(const BitmaskView& other) const {
+            for (int i = 0; i < size; ++i) {
+                if (ptr[i] != other.ptr[i]) { return false; }
             }
+            return true;
+        }
 
-            const int bits = 64;
-            int wordShift = shift / bits;
-            int bitShift = shift % bits;
+        bool operator!=(const BitmaskView& other) const {
+            for (int i = 0; i < size; ++i) {
+                if (ptr[i] != other.ptr[i]) { return true; }
+            }
+            return false;
+        }
 
-            for (size_t i = 0; i < N; ++i) {
-                if (i < wordShift) continue;
+        inline operator bool() const {
+            for (int i = 0; i < size; ++i) {
+                if (ptr[i] != 0) { return true; }
+            }
+            return false;
+        }
 
-                int j = i - wordShift;
-                vals[j] |= data[i] >> bitShift;
+        inline bool operator!() const {
+            return !static_cast<bool>(*this);
+        }
 
-                if (bitShift != 0 && j > 0) {
-                    vals[j - 1] |= data[i] << (bits - bitShift);
+        BitmaskView& operator--() {
+            for (int i = 0; i < size; ++i) {
+                if (ptr[i] != 0) {
+                    --ptr[i];
+                    break;
+                }
+
+                ptr[i] = (T)-1;
+            }
+            return *this;
+        }
+
+        BitmaskView& operator++() {
+            for (int i = 0; i < size; ++i) {
+                ++ptr[i];
+                if (ptr[i] != 0) {
+                    break;
                 }
             }
-
-            return bitmask(vals);
+            return *this;
         }
-        HD bitmask& operator>>=(int shift) {
+
+        BitmaskView& operator>>=(int shift) {
 
             if (shift < 0) {
                 return *this <<= -shift;
             }
 
-            const int bits = 64;
-            int wordShift = shift / bits;
-            int bitShift = shift % bits;
+            int wordShift = shift / chunckBitSize;
+            int bitShift = shift % chunckBitSize;
 
-            if (wordShift >= N) {
-                for (int i = 0; i < N; ++i) { data[i] = 0; }
+            if (wordShift >= size) {
+                for (int i = 0; i < size; ++i) { ptr[i] = 0; }
                 return *this;
             }
 
-            for (int i = 0; i < N - wordShift; ++i) {
-                data[i] = data[i + wordShift];
+            for (int i = 0; i < size - wordShift; ++i) {
+                ptr[i] = ptr[i + wordShift];
             }
-            for (int i = N - wordShift; i < N; ++i) {
-                data[i] = 0;
+            for (int i = size - wordShift; i < size; ++i) {
+                ptr[i] = 0;
             }
 
             if (bitShift > 0) {
-                for (int i = 0; i < N - 1; ++i) {
-                    data[i] >>= bitShift;
-                    data[i] |= data[i + 1] << (bits - bitShift);
+                for (int i = 0; i < size - 1; ++i) {
+                    ptr[i] >>= bitShift;
+                    ptr[i] |= ptr[i + 1] << (chunckBitSize - bitShift);
                 }
-                data[N - 1] >>= bitShift;
+                ptr[size - 1] >>= bitShift;
             }
 
             return *this;
         }
 
-        HD bitmask operator~() const {
-            uint64_t vals[N];
-            for (size_t i = 0; i < N; ++i) {
-                vals[i] = ~data[i];
-            }
-            return bitmask(vals);
-        }
+        BitmaskView& operator<<=(int shift) {
 
-        HD bool operator==(const bitmask& solved) const {
-            for (size_t i = 0; i < N; ++i) {
-                if (data[i] != solved.data[i]) { return false; }
+            if (shift < 0) {
+                return *this >>= -shift;
             }
-            return true;
-        }
-        HD bool operator!=(const bitmask& solved) const {
-            for (size_t i = 0; i < N; ++i) {
-                if (data[i] != solved.data[i]) { return true; }
+
+            int wordShift = shift / chunckBitSize;
+            int bitShift = shift % chunckBitSize;
+
+            if (wordShift >= size) {
+                for (int i = 0; i < size; ++i) ptr[i] = 0;
+                return *this;
             }
-            return false;
-        }
 
-        HD inline operator bool() const {
-            for (size_t i = 0; i < N; ++i) {
-                if (data[i] != 0) { return true; }
+            for (int i = size - 1; i >= wordShift; --i) {
+                ptr[i] = ptr[i - wordShift];
             }
-            return false;
-        }
 
-        HD inline bool operator!() const {
-            return !static_cast<bool>(*this);
-        }
+            for (int i = wordShift - 1; i >= 0; --i) {
+                ptr[i] = 0;
+            }
 
-        bitmask& operator--() {
-            for (size_t i = 0; i < N; ++i) {
-                if (data[i] != 0) {
-                    --data[i];
-                    break;
+            if (bitShift > 0) {
+                for (int i = size - 1; i > 0; --i) {
+                    ptr[i] <<= bitShift;
+                    ptr[i] |= ptr[i - 1] >> (chunckBitSize - bitShift);
                 }
-
-                data[i] = UINT64_MAX;
+                ptr[0] <<= bitShift;
             }
+
             return *this;
         }
 
-        bitmask operator--(int) {
-            bitmask temp = *this;
-            --(*this);
-            return temp;
-        }
+        int getSize() const { return size; }
 
-        bitmask& operator++() {
-            for (size_t i = 0; i < N; ++i) {
-                ++data[i];
-                if (data[i] != 0) {
-                    break;
-                }
-            }
-            return *this;
-        }
-
-        bitmask operator++(int) {
-            bitmask temp = *this;
-            ++(*this);
-            return temp;
-        }
-
-        bool operator>(const bitmask& solved) const {
-            for (int i = N - 1; i >= 0; --i) {
-                if (data[i] > solved.data[i]) return true;
-                if (data[i] < solved.data[i]) return false;
-            }
-            return false;
-        }
-
-        bool operator>=(const bitmask& solved) const {
-            return !(*this < solved);
-        }
-
-        bool operator<=(const bitmask& solved) const {
-            return !(*this > solved);
-        }
-
-        bool operator<(const bitmask& solved) const {
-            for (int i = N - 1; i >= 0; --i) {
-                if (data[i] < solved.data[i]) return true;
-                if (data[i] > solved.data[i]) return false;
-            }
-            return false;
-        }
-
-        friend std::ostream& operator<<(std::ostream& os, const bitmask& mask) {
+        friend std::ostream& operator<<(std::ostream& os, const BitmaskView& mask) {
             os << std::hex << "0x";
-            for (int i = N - 1; i >= 0; --i) {
-                os << std::setfill('0') << std::setw(16) << mask.data[i];
+            for (int i = size - 1; i >= 0; --i) {
+                os << std::setfill('0') << std::setw(16) << mask.ptr[i];
             }
             os << std::dec;
             return os;
         }
 
-        uint64_t popCount() const {
-            uint64_t pc{};
-            for (size_t i = 0; i < N; i++)
-                pc += std::popcount(data[i]);
-            return pc;
+    private:
+        T* ptr;
+        int size;
+    };
+
+    template<typename T>
+    class BitmaskBufferView {
+    public:
+
+        BitmaskBufferView() = default;
+
+        BitmaskBufferView(T* ptr, int elementsCount, int numChunkPerElement, bool isFull = false)
+            : ptr(ptr), elementsCount(elementsCount), numChunkPerElement(numChunkPerElement), _count(isFull ? elementsCount : 0) {
         }
 
-        void print() const {
-            printf("from high to low:");
-            for (int i = N - 1; i >= 0; --i) {
-                if (i == 0) {
-                    printf(" %lu\n", data[i]);
-                }
-                else {
-                    printf(" %lu,", data[i]);
-                }
-            }
+        BitmaskView<T> at(int index) const {
+            return  BitmaskView(ptr + index * numChunkPerElement, numChunkPerElement);
         }
+
+        BitmaskView<T> operator[](int index) const {
+            return BitmaskView(ptr + index * numChunkPerElement, numChunkPerElement);
+        }
+
+        T* data() { return ptr; }
+        int size() const { return elementsCount; }
+        int getNumChuncksPerElement() const { return numChunkPerElement; }
+
+        BitmaskBufferView getView(int start, int elementsCount, bool isFull = false) { 
+            return BitmaskBufferView(ptr + start * numChunkPerElement, elementsCount, numChunkPerElement, isFull);
+        }
+
+        int count() const { return _count; }
+        BitmaskView<T> append() { return BitmaskView(ptr + _count++ * numChunkPerElement, numChunkPerElement); }
+        void removeLast() { _count--; }
+        bool reset() { _count = 0; }
+
+        bool isFull() const { return _count == elementsCount; }
+        bool isEmpty() const { return _count == 0; }
 
     private:
-        uint64_t data[N];
-    };
-}
-
-namespace std {
-    template <int N>
-    struct hash<rei::bitmask<N>> {
-        HD std::size_t operator()(const rei::bitmask<N>& s) const {
-            auto [high, low] = s.get128Hash();
-            std::size_t h1 = std::hash<uint64_t>{}(low);
-            std::size_t h2 = std::hash<uint64_t>{}(high);
-            return h1 ^ (h2 << 1);
-        }
+        T* ptr;
+        int elementsCount;
+        int numChunkPerElement;
+        int _count;
     };
 }
 

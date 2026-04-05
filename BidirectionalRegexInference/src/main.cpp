@@ -56,7 +56,7 @@ int main(int argc, const char* argv[]) {
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    auto res = rei::Run(costFun, maxCost, pos, neg, 60 * 60 * 60);
+    auto res = rei::Run(rei::SearchType::Bidirectional, costFun, maxCost, pos, neg, 60 * 60 * 60);
 
     auto stop = std::chrono::high_resolution_clock::now();
 

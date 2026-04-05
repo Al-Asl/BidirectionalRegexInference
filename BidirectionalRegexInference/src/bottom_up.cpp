@@ -1,81 +1,92 @@
 #include <bottom_up.hpp>
+#include <numeric>
 
 #define LOG_OP(context, cost, op_string, dif) \
         int tbc = dif; \
         if (tbc) printf("Cost %-2d | (%s) | AllREs: %-11llu | StoredREs: %-10d | ToBeChecked: %-10d \n", \
-            cost, op_string.c_str() ,context.allREs, context.lastIdx, tbc);
+            cost, op_string.c_str() ,context.allREs, context.cache.count(), tbc);
 
-rei::BottomUpSearch::Context::Context(int cache_capacity, const CS& posBits, const CS& negBits) : cache_capacity(cache_capacity), posBits(posBits), negBits(negBits) {
+#define CREATE_CS(name, size) \
+    std::vector<uint64_t> name##_data(size,0); \
+    CS name(name##_data.data(), size); \
 
-    cache = new CS[cache_capacity + 1];
+rei::BottomUpSearch::Context::Context(int cache_capacity, int n, const CS& posBits, const CS& negBits) : 
+    posBits(posBits), negBits(negBits) {
+
+    cache = CSBuffer(new uint64_t[(cache_capacity + 1) * n], cache_capacity, n);
     leftRightIdx = new int[2 * (cache_capacity + 1)];
 
-    lastIdx = 0;
     allREs = 0;
     onTheFly = false;
 }
 
 rei::BottomUpSearch::Context::~Context() {
-    delete[] cache;
+    delete[] cache.data();
     delete[] leftRightIdx;
 }
 
-bool rei::BottomUpSearch::Context::InsertAndCheck(CS CS, int index) {
-    return InsertAndCheck(CS, index, -1);
+bool rei::BottomUpSearch::Context::insertAndCheck(CS cs, int index) {
+    return insertAndCheck(cs, index, -1);
 }
 
-bool rei::BottomUpSearch::Context::InsertAndCheck(CS CS, int lIndex, int rIndex)
+bool rei::BottomUpSearch::Context::insertAndCheck(CS cs, int lIndex, int rIndex)
 {
     allREs++;
     if (onTheFly) {
-        if ((CS & posBits) == posBits && (~CS & negBits) == negBits) {
-            leftRightIdx[lastIdx << 1] = lIndex;
+        if (cs.containsAll(posBits) && cs.containsNone(negBits)) {
+            leftRightIdx[cache.count() << 1] = lIndex;
             if (rIndex > -1)
-                leftRightIdx[(lastIdx << 1) + 1] = rIndex;
+                leftRightIdx[(cache.count() << 1) + 1] = rIndex;
             return true;
         }
     }
-    else if (visited.find(CS) == visited.end())
+    else if (visited.insert(cs.getHash()).second)
     {
-        leftRightIdx[lastIdx << 1] = lIndex;
+        leftRightIdx[cache.count() << 1] = lIndex;
         if (rIndex > -1)
-            leftRightIdx[(lastIdx << 1) + 1] = rIndex;
-        if ((CS & posBits) == posBits && (~CS & negBits) == negBits) {
+            leftRightIdx[(cache.count() << 1) + 1] = rIndex;
+        if (cs.containsAll(posBits) && cs.containsNone(negBits)) {
             return true;
         }
-        visited[CS] = lastIdx;
-        cache[lastIdx++] = CS;
-        if (lastIdx == cache_capacity) onTheFly = true;
+        cache.append().copy(cs);
+        if (cache.isFull()) onTheFly = true;
     }
     return false;
 }
 
-std::span<CS> rei::BottomUpSearch::Context::GetCacheSlice(int start, int end) {
-    return std::span<CS>(cache + start, end - start);
+CSBuffer rei::BottomUpSearch::Context::getCacheSlice(int start, int end) {
+    return cache.getView(start, end - start);
 }
 
 rei::BottomUpSearch::BottomUpSearch(const GuideTable& guideTable, const std::set<char>& alphabets, const Costs& costs, const unsigned short maxCost, const CS& posBits, const CS& negBits, int cache_capacity) :
-    guideTable(guideTable), alphabet(alphabets), costs(costs), maxCost(maxCost), posBits(posBits), negBits(negBits), context(cache_capacity, posBits, negBits), partitioner(maxCost + 1) {
+    guideTable(guideTable), alphabet(alphabets), costs(costs), maxCost(maxCost), context(cache_capacity, CS::getChuncksSize(guideTable.ICsize), posBits, negBits), partitioner(maxCost + 1) {
 
-    costLevel = costs.alpha + 1;
+    costLevel = costs.alphaCost() + 1;
     shortageCost = -1;
     lastRound = false;
 
+    auto n = CS::getChuncksSize(guideTable.ICsize);
+    CREATE_CS(cs, n)
+
+    partitioner.fillTo(costs.alphaCost(), 0);
+
     // adding eps, empty and alphabets
-    context.visited[CS()] = -1;
-    context.visited[CS::one()] = -1;
+    context.visited.insert(cs.getHash());
+    context.visited.insert(cs.toggleBit(0).getHash());
+    cs.toggleBit(0);
     for (int i = 0; i < static_cast<int>(alphabets.size()); i++)
     {
-        auto alpha = CS::one() << (i + 1);
-        context.visited[alpha] = context.lastIdx;
-        context.cache[context.lastIdx++] = alpha;
+        cs.toggleBit(i + 1);
+        context.visited.insert(cs.getHash());
+        context.cache.append().copy(cs);
+        cs.toggleBit(i + 1);
     }
 
-    partitioner.end(costs.alpha, Operation::Concatenate) = context.lastIdx;
-    partitioner.end(costs.alpha, Operation::Or) = context.lastIdx;
+    partitioner.end(costs.alphaCost(), Operation::Concatenate) = context.cache.count();
+    partitioner.end(costs.alphaCost(), Operation::Or) = context.cache.count();
 }
 
-rei::EnumerationState rei::BottomUpSearch::EnumerateCostLevel(BottomUpSearchResult& res) {
+rei::EnumerationState rei::BottomUpSearch::enumerateCostLevel(BottomUpSearchResult& res) {
 
     if (costLevel > maxCost) return EnumerationState::End;
 
@@ -86,51 +97,51 @@ rei::EnumerationState rei::BottomUpSearch::EnumerateCostLevel(BottomUpSearchResu
         res.RE = constructDownward(solvedIdx);
 
     res.cost = costLevel;
-    res.allREs = context.allREs;
+    res.allCS = context.allREs;
 
     costLevel++;
     return enumState;
 
 }
 
-uint64_t rei::BottomUpSearch::EstimateNextLevelCS() {
+uint64_t rei::BottomUpSearch::estimateNextLevel() {
 
     uint64_t count = 0;
 
-    bool useQuestionOverOr = costs.alpha + costs.alternation >= costs.question;
+    bool useQuestionOverOr = costs.alphaCost() + costs.operationCost(Operation::Or) >= costs.operationCost(Operation::Question);
 
     //Question Mark
-    if (costLevel >= costs.alpha + costs.question && useQuestionOverOr) {
+    if (costLevel >= costs.alphaCost() + costs.operationCost(Operation::Question) && useQuestionOverOr) {
         // ignore results from (*) and (?)
-        auto [start, end] = partitioner.Interval(costLevel - costs.star, static_cast<Operation>(2));
+        auto [start, end] = partitioner.Interval(costLevel - costs.operationCost(Operation::Star), static_cast<Operation>(2));
         count += (end - start);
     }
 
-    if (costLevel >= costs.alpha + costs.star) {
+    if (costLevel >= costs.alphaCost() + costs.operationCost(Operation::Star)) {
         // ignore results from (*) and (?)
-        auto [start, end] = partitioner.Interval(costLevel - costs.star, static_cast<Operation>(2));
+        auto [start, end] = partitioner.Interval(costLevel - costs.operationCost(Operation::Star), static_cast<Operation>(2));
         count += (end - start);
     }
 
     //Concatenate
-    for (int i = costs.alpha; 2 * i <= costLevel - costs.concat; ++i) {
+    for (int i = costs.alphaCost(); 2 * i <= costLevel - costs.operationCost(Operation::Concatenate); ++i) {
 
         auto [lstart, lend] = partitioner.Interval(i);
-        auto [rstart, rend] = partitioner.Interval(costLevel - i - costs.concat);
+        auto [rstart, rend] = partitioner.Interval(costLevel - i - costs.operationCost(Operation::Concatenate));
 
         count += 2 * (lend - lstart) * (rend - rstart);
     }
 
     //Union
-    if (!useQuestionOverOr && costLevel >= 2 * costs.alpha + costs.alternation) {
+    if (!useQuestionOverOr && costLevel >= 2 * costs.alphaCost() + costs.operationCost(Operation::Or)) {
 
-        auto [start, end] = partitioner.Interval(costLevel - costs.alpha - costs.alternation);
+        auto [start, end] = partitioner.Interval(costLevel - costs.alphaCost() - costs.operationCost(Operation::Or));
         count += (end - start);
     }
-    for (int i = costs.alpha; 2 * i <= costLevel - costs.alternation; ++i) {
+    for (int i = costs.alphaCost(); 2 * i <= costLevel - costs.operationCost(Operation::Or); ++i) {
 
         auto [lstart, lend] = partitioner.Interval(i);
-        auto [rstart, rend] = partitioner.Interval(costLevel - i - costs.alternation);
+        auto [rstart, rend] = partitioner.Interval(costLevel - i - costs.operationCost(Operation::Or));
 
         count += (lend - lstart) * (rend - rstart);
     }
@@ -138,15 +149,31 @@ uint64_t rei::BottomUpSearch::EstimateNextLevelCS() {
     return count;
 }
 
-std::string rei::BottomUpSearch::ConstructRE(const CS& cs) const {
-    auto idx = context.visited.at(cs);
+std::string rei::BottomUpSearch::constructRE(int idx) const {
     if (idx == -1) return std::string("eps");
     return constructDownward(idx);
 }
 
-std::span<CS> rei::BottomUpSearch::GetLastCostLevel() const {
-    auto [start, end] = partitioner.Interval(costLevel - 1);
-    return std::span<CS>(context.cache + start, end - start);
+const CS rei::BottomUpSearch::getCS(int idx) const
+{
+    return context.cache[idx];
+}
+
+std::vector<int> rei::BottomUpSearch::getLastCostLevel(int& cost) {
+    cost = costLevel - 1;
+    auto [start, end] = partitioner.Interval(cost);
+    if (start == 0)
+    {
+        std::vector<int> ids(end - start + 1);
+        iota(ids.begin(), ids.end(), -1);
+        return ids;
+    }
+    else 
+    {
+        std::vector<int> ids(end - start);
+        iota(ids.begin(), ids.end(), start);
+        return ids;
+    }
 }
 
 // Adding parentheses if needed
@@ -166,8 +193,7 @@ std::string rei::BottomUpSearch::constructDownward(int index) const {
     if (index == -2) return "eps"; // Epsilon
     if (index < alphabet.size()) { std::string s(1, *next(alphabet.begin(), index)); return s; }
 
-    int cost; Operation op;
-    partitioner.indexToLevel(index, cost, op);
+    auto [cost, op] = partitioner.indexToLevel(index);
 
     if (op == Operation::Question) {
         std::string res = constructDownward(context.leftRightIdx[index << 1]);
@@ -196,134 +222,134 @@ std::string rei::BottomUpSearch::constructDownward(int index) const {
 }
 
 rei::EnumerationState rei::BottomUpSearch::enumerateLevel(int& idx) {
-    bool useQuestionOverOr = costs.alpha + costs.alternation >= costs.question;
+    bool useQuestionOverOr = costs.alphaCost() + costs.operationCost(Operation::Or) >= costs.operationCost(Operation::Question);
 
     // Once it uses a previous cost that is not fully stored, it should continue as the last round
     if (context.onTheFly) {
         int dif = costLevel - shortageCost;
-        if (dif == costs.question || dif == costs.star || dif == costs.alpha + costs.concat || dif == costs.alpha + costs.alternation) lastRound = true;
+        if (dif == costs.operationCost(Operation::Question) || dif == costs.operationCost(Operation::Star) || 
+            dif == costs.alphaCost() + costs.operationCost(Operation::Concatenate) || dif == costs.alphaCost() + costs.operationCost(Operation::Or))
+            lastRound = true;
     }
 
+    CREATE_CS(cs, CS::getChuncksSize(guideTable.ICsize))
+
     //Question Mark
-    if (costLevel >= costs.alpha + costs.question && useQuestionOverOr) {
+    if (costLevel >= costs.alphaCost() + costs.operationCost(Operation::Question) && useQuestionOverOr) {
 
         // ignore results from (*) and (?)
-        auto [start, end] = partitioner.Interval(costLevel - costs.question, static_cast<Operation>(2));
-        auto pLevel = context.GetCacheSlice(start, end);
+        auto [start, end] = partitioner.Interval(costLevel - costs.operationCost(Operation::Question), static_cast<Operation>(2));
+        auto pLevel = context.getCacheSlice(start, end);
         LOG_OP(context, costLevel, to_string(Operation::Question), end - start);
         for (auto i = start; i < end; i++)
         {
-            CS cs = pLevel[i - start];
-            if (!(cs & CS::one())) {
-                cs = processQuestion(cs);
-                if (context.InsertAndCheck(cs, i))
+            pLevel[i - start].copyTo(cs);
+            if (!cs.getBit(0)) {
+                processQuestion(cs);
+                if (context.insertAndCheck(cs, i))
                 {
-                    partitioner.end(costLevel, Operation::Question) = INT_MAX;
-                    idx = context.lastIdx;
+                    idx = context.cache.count();
                     return EnumerationState::Found;
                 }
             }
         }
     }
-    partitioner.end(costLevel, Operation::Question) = context.lastIdx;
+    partitioner.end(costLevel, Operation::Question) = context.cache.count();
 
     //Star
-    if (costLevel >= costs.alpha + costs.star) {
+    if (costLevel >= costs.alphaCost() + costs.operationCost(Operation::Star)) {
         // ignore results from (*) and (?)
-        auto [start, end] = partitioner.Interval(costLevel - costs.star, static_cast<Operation>(2));
-        auto pLevel = context.GetCacheSlice(start, end);
+        auto [start, end] = partitioner.Interval(costLevel - costs.operationCost(Operation::Star), static_cast<Operation>(2));
+        auto pLevel = context.getCacheSlice(start, end);
         LOG_OP(context, costLevel, to_string(Operation::Star), end - start);
         for (auto i = start; i < end; i++)
         {
-            CS cs = pLevel[i - start];
-            cs = processStar(guideTable, cs);
-            if (context.InsertAndCheck(cs, i))
+            pLevel[i - start].copyTo(cs);
+            processStar(guideTable, cs);
+            if (context.insertAndCheck(cs, i))
             {
-                partitioner.end(costLevel, Operation::Star) = INT_MAX;
-                idx = context.lastIdx;
+                idx = context.cache.count();
                 return EnumerationState::Found;
             }
         }
     }
-    partitioner.end(costLevel, Operation::Star) = context.lastIdx;
+    partitioner.end(costLevel, Operation::Star) = context.cache.count();
 
     //Concatenate
-    for (int i = costs.alpha; 2 * i <= costLevel - costs.concat; ++i) {
+    for (int i = costs.alphaCost(); 2 * i <= costLevel - costs.operationCost(Operation::Concatenate); ++i) {
 
         auto [lstart, lend] = partitioner.Interval(i);
-        auto [rstart, rend] = partitioner.Interval(costLevel - i - costs.concat);
-        auto lpLevel = context.GetCacheSlice(lstart, lend);
-        auto rpLevel = context.GetCacheSlice(rstart, rend);
+        auto [rstart, rend] = partitioner.Interval(costLevel - i - costs.operationCost(Operation::Concatenate));
+        auto lpLevel = context.getCacheSlice(lstart, lend);
+        auto rpLevel = context.getCacheSlice(rstart, rend);
         LOG_OP(context, costLevel, to_string(Operation::Concatenate), 2 * (rend - rstart) * (lend - lstart));
 
         for (int l = lstart; l < lend; ++l) {
             CS left = lpLevel[l - lstart];
             for (int r = rstart; r < rend; ++r) {
 
-                auto leftRight = processConcatenate(guideTable, left, rpLevel[r - rstart]);
-                auto rightLeft = processConcatenate(guideTable, rpLevel[r - rstart], left);
+                processConcatenate(guideTable, left, rpLevel[r - rstart], cs.clear());
 
-                if (context.InsertAndCheck(leftRight, l, r))
+                if (context.insertAndCheck(cs, l, r))
                 {
-                    partitioner.end(costLevel, Operation::Concatenate) = INT_MAX;
-                    idx = context.lastIdx;
+                    idx = context.cache.count();
                     return EnumerationState::Found;
                 }
 
-                if (context.InsertAndCheck(rightLeft, r, l))
+                processConcatenate(guideTable, rpLevel[r - rstart], left, cs.clear());
+
+                if (context.insertAndCheck(cs, r, l))
                 {
-                    partitioner.end(costLevel, Operation::Concatenate) = INT_MAX;
-                    idx = context.lastIdx;
+                    idx = context.cache.count();
                     return EnumerationState::Found;
                 }
             }
         }
 
     }
-    partitioner.end(costLevel, Operation::Concatenate) = context.lastIdx;
+    partitioner.end(costLevel, Operation::Concatenate) = context.cache.count();
 
     //Union
-    if (!useQuestionOverOr && costLevel >= 2 * costs.alpha + costs.alternation) {
+    if (!useQuestionOverOr && costLevel >= 2 * costs.alphaCost() + costs.operationCost(Operation::Or)) {
 
-        auto [rstart, rend] = partitioner.Interval(costLevel - costs.alpha - costs.alternation);
-        auto pLevel = context.GetCacheSlice(rstart, rend);
-        LOG_OP(context, costLevel, to_string(Operation::Or), rend - rstart);
+        auto [start, end] = partitioner.Interval(costLevel - costs.alphaCost() - costs.operationCost(Operation::Or));
+        auto pLevel = context.getCacheSlice(start, end);
+        LOG_OP(context, costLevel, to_string(Operation::Or), end - start);
 
-        for (int r = rstart; r < rend; ++r) {
+        for (int r = start; r < end; ++r) {
 
-            CS cs = processOr(CS::one(), pLevel[r - rstart]);
+            pLevel[r - start].copyTo(cs);
+            processQuestion(cs);
 
-            if (context.InsertAndCheck(cs, -2, r))
+            if (context.insertAndCheck(cs, -2, r))
             {
-                partitioner.end(costLevel, Operation::Or) = INT_MAX;
-                idx = context.lastIdx;
+                idx = context.cache.count();
                 return EnumerationState::Found;
             }
         }
     }
-    for (int i = costs.alpha; 2 * i <= costLevel - costs.alternation; ++i) {
+    for (int i = costs.alphaCost(); 2 * i <= costLevel - costs.operationCost(Operation::Or); ++i) {
 
         auto [lstart, lend] = partitioner.Interval(i);
-        auto [rstart, rend] = partitioner.Interval(costLevel - i - costs.alternation);
-        auto lpLevel = context.GetCacheSlice(lstart, lend);
-        auto rpLevel = context.GetCacheSlice(rstart, rend);
+        auto [rstart, rend] = partitioner.Interval(costLevel - i - costs.operationCost(Operation::Or));
+        auto lpLevel = context.getCacheSlice(lstart, lend);
+        auto rpLevel = context.getCacheSlice(rstart, rend);
         LOG_OP(context, costLevel, to_string(Operation::Or), (rend - rstart) * (lend - lstart));
         for (int l = lstart; l < lend; ++l) {
             CS left = lpLevel[l - lstart];
             for (int r = rstart; r < rend; ++r) {
 
-                CS cs = processOr(left, rpLevel[r - rstart]);
+                processOr(left, rpLevel[r - rstart], cs.clear());
 
-                if (context.InsertAndCheck(cs, l, r))
+                if (context.insertAndCheck(cs, l, r))
                 {
-                    partitioner.end(costLevel, Operation::Or) = INT_MAX;
-                    idx = context.lastIdx;
+                    idx = context.cache.count();
                     return EnumerationState::Found;
                 }
             }
         }
     }
-    partitioner.end(costLevel, Operation::Or) = context.lastIdx;
+    partitioner.end(costLevel, Operation::Or) = context.cache.count();
 
     if (lastRound) return EnumerationState::End;
     if (context.onTheFly && shortageCost == -1) shortageCost = costLevel;

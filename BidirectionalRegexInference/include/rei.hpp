@@ -17,7 +17,13 @@ namespace rei {
         }
     };
 
-	Result Run(const unsigned short* costFun, const unsigned short maxCost,
+    enum class SearchType {
+        BottomUp,
+        TopDown,
+        Bidirectional
+    };
+
+	Result Run(SearchType searchType, const unsigned short* costFun, const unsigned short maxCost,
         const std::vector<std::string>& pos, const std::vector<std::string>& neg, double maxTime);
 }
 
