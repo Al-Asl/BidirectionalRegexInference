@@ -1,5 +1,7 @@
 #include <guide_table.hpp>
 
+#include<unordered_map>
+
 using namespace rei;
 
 // Shortlex ordering
@@ -44,42 +46,36 @@ bool generatingGuideTable(GuideTable* guideTable, const std::set<std::string, st
         alphabetSize++;
     }
 
-    std::vector<std::vector<int>> gt;
-
-    for (auto& word : ic) {
-        std::vector<int> row;
-        for (int i = 1; i < word.length(); ++i) {
-
-            int index1 = 0;
-            for (auto& w : ic) {
-                if (w == word.substr(0, i)) break;
-                index1++;
-            }
-            int index2 = 0;
-            for (auto& w : ic) {
-                if (w == word.substr(i)) break;
-                index2++;
-            }
-
-            row.push_back(index1);
-            row.push_back(index2);
-        }
-
-        row.push_back(0);
-        gt.push_back(row);
+    std::unordered_map<std::string, int> indexMap;
+    indexMap.reserve(ic.size());
+    int idx = 0;
+    for (const auto& w : ic) {
+        indexMap[w] = idx++;
     }
 
-    if (gt.size() > sizeof(CS) * 8) {
-        printf("Your input needs %llu bits which exceeds %llu bits ", gt.size(), sizeof(CS) * 8);
-        printf("(current version).\nPlease use less/shorter words and run the code again.\n");
-        return false;
+    std::vector<std::vector<std::pair<int, int>>> gt;
+    gt.reserve(ic.size());
+
+    for (const auto& word : ic) {
+        std::vector<std::pair<int, int>> row;
+        const int len = static_cast<int>(word.length());
+        if (len > 1) row.reserve(len - 1);
+
+        for (int i = 1; i < len; ++i) {
+            row.emplace_back(
+                indexMap.at(word.substr(0, i)),
+                indexMap.at(word.substr(i))
+            );
+        }
+
+        gt.push_back(std::move(row));
     }
 
     new (guideTable) GuideTable(gt, alphabetSize);
     return true;
 }
 
-bool rei::generatingGuideTable(GuideTable& guideTable, CS& posBits, CS& negBits,
+bool rei::generatingGuideTable(GuideTable& guideTable, std::vector<int>& posBits, std::vector<int>& negBits,
     const std::vector<std::string>& pos, const std::vector<std::string>& neg) {
 
     std::set<std::string, strComparison> ic = generatingIC(pos, neg);
@@ -89,76 +85,104 @@ bool rei::generatingGuideTable(GuideTable& guideTable, CS& posBits, CS& negBits,
 
     for (auto& p : pos) {
         int wordIndex = distance(ic.begin(), ic.find(p));
-        posBits |= (CS::one() << wordIndex);
+        posBits.push_back(wordIndex);
     }
 
     for (auto& n : neg) {
         int wordIndex = distance(ic.begin(), ic.find(n));
-        negBits |= (CS::one() << wordIndex);
+        negBits.push_back(wordIndex);
     }
 
     return true;
 }
 
+uint16_t* to_array(std::vector<std::vector<std::pair<int, int>>> vv, int& rowSize) {
 
-rei::GuideTable::Iterator::Iterator(const int* p) : ptr(p) {}
+    auto maxRow = (*std::max_element(vv.begin(), vv.end(), [](const auto& a, const auto& b) { return a.size() < b.size(); })).size();
+    rowSize = (2 * maxRow + 1);
 
-rei::Pair<int> rei::GuideTable::Iterator::operator*() const { return Pair<int>(*ptr, *(ptr + 1)); }
-rei::GuideTable::Iterator& rei::GuideTable::Iterator::operator++() { ptr += 2; return *this; }
-bool rei::GuideTable::Iterator::operator!=(const Iterator& solved) const { return *ptr; }
+    auto data = new uint16_t[vv.size() * rowSize];
+    std::fill(data, data + vv.size() * rowSize, 0);
 
-rei::GuideTable::RowIterator::RowIterator(const int* data, int gtColumns, int rowIndex) : row(rowIndex), data(data), gtColumns(gtColumns) {}
-rei::GuideTable::Iterator rei::GuideTable::RowIterator::begin() { return Iterator(data + row * gtColumns); }
-rei::GuideTable::Iterator rei::GuideTable::RowIterator::end() { return Iterator(data + (row + 1) * gtColumns); }
+    for (int i = 0; i < vv.size(); ++i) {
+        for (int j = 0; j < vv.at(i).size(); ++j) {
+            data[i * rowSize + j * 2] = (uint16_t)vv.at(i).at(j).first;
+            data[i * rowSize + j * 2 + 1] = (uint16_t)vv.at(i).at(j).second;
+        }
+    }
 
+    return data;
+}
 
-rei::GuideTable::GuideTable(std::vector<std::vector<int>> gt, int alphabetSize) : alphabetSize(alphabetSize)
+rei::GuideTable::GuideTable(std::vector<std::vector<std::pair<int,int>>> gt, int alphabetSize) : alphabetSize(alphabetSize)
 {
     ICsize = static_cast<int> (gt.size());
-    gtColumns = static_cast<int> (gt.back().size());
 
-    data = new int[ICsize * gtColumns];
+    splits = to_array(gt, splitsRowSize);
 
-    for (int i = 0; i < ICsize; ++i) {
-        for (int j = 0; j < gt.at(i).size(); ++j) {
-            data[i * gtColumns + j] = gt.at(i).at(j);
-        }
-    }
-
-    // construct the adjacency list
-    {
-        std::vector<std::pair<int, int>> row;
-
-        for (int i = 0; i < ICsize; i++)
-            row.emplace_back(i, i);
-
-        adjacencyList.push_back(row);
-    }
-
+    splitsRowSizes = new int[ICsize];
+    splitsRowSizes[0] = 1;
     for (int i = 1; i < ICsize; i++)
-    {
-        std::vector<std::pair<int, int>> row;
-        row.emplace_back(0, i);
-        adjacencyList.push_back(row);
-    }
+        splitsRowSizes[i] = gt.at(i).size();
+
+    auto left = std::vector < std::vector<std::pair<int, int>>>();
+    left.reserve(ICsize);
+    for (int i = 0; i < ICsize; i++) { left.emplace_back(); }
 
     for (int i = 0; i < ICsize; ++i) {
-        for (int j = 0; j < gt.at(i).size() - 1; j += 2) {
-            auto left_index = gt.at(i).at(j);
-            auto right_index = gt.at(i).at(j + 1);
-            adjacencyList[left_index].emplace_back(right_index, i);
+        for (int j = 0; j < gt.at(i).size(); j ++) {
+
+            auto [leftIdx, rightIdx] = gt.at(i).at(j);
+            left[leftIdx].emplace_back(rightIdx, i);
         }
     }
+
+    suffixes = to_array(left, suffixesRowSize);
+
+    auto right = std::vector < std::vector<std::pair<int, int>>>();
+    right.reserve(ICsize);
+    for (int i = 0; i < ICsize; i++) { right.emplace_back(); }
+
+    for (int i = 0; i < ICsize; ++i) {
+        for (int j = 0; j < gt.at(i).size(); j++) {
+
+            auto [leftIdx, rightIdx] = gt.at(i).at(j);
+            right[rightIdx].emplace_back(leftIdx, i);
+        }
+    }
+
+    prefixes = to_array(right, prefixesRowSize);
 }
 
-rei::GuideTable::GuideTable() : ICsize(0), gtColumns(0), alphabetSize(0), data(nullptr) {}
+rei::GuideTable::GuideTable() : ICsize(0), splitsRowSize(0), alphabetSize(0), splits(nullptr) {}
 
 rei::GuideTable::~GuideTable() {
-    if (data != nullptr) {
-        delete[] data;
-    }
+    delete[] splits;
+    delete[] splitsRowSizes;
+    delete[] suffixes;
+    delete[] prefixes;
 }
 
-rei::GuideTable::RowIterator rei::GuideTable::IterateRow(int rowIndex) const {
-    return RowIterator(data, gtColumns, rowIndex);
+int rei::GuideTable::getMaxSplits() const
+{
+    return (splitsRowSize - 1) / 2;
+}
+
+int rei::GuideTable::getSplitsCount(int rowIndex) const
+{
+    return splitsRowSizes[rowIndex];
+}
+
+rei::PairRange<uint16_t> rei::GuideTable::iterateSplits(int rowIndex) const {
+    return PairRange<uint16_t>(splits, splitsRowSize, rowIndex);
+}
+
+rei::PairRange<uint16_t> rei::GuideTable::iterateSuffixes(int rowIndex) const
+{
+    return PairRange<uint16_t>(suffixes, suffixesRowSize, rowIndex);
+}
+
+rei::PairRange<uint16_t> rei::GuideTable::iteratePrefixes(int rowIndex) const
+{
+    return PairRange<uint16_t>(prefixes, prefixesRowSize, rowIndex);
 }
