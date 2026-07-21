@@ -2,7 +2,7 @@
 <h1><strong>Bidirectional Regex Inference</strong></h1>
 </div>
 
-This word is based ono the Parallel Regular Expression Synthesiser (**PaRESy**) by *Mojtaba Valizadeh* and *Martin Berger*.  
+This work is based on the Parallel Regular Expression Synthesiser (**PaRESy**) by *Mojtaba Valizadeh* and *Martin Berger*.  
 
 For more details on their work, refer to their [paper](https://dl.acm.org/doi/10.1145/3591274).
 
