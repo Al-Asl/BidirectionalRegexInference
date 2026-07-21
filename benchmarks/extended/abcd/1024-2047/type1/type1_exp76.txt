@@ -1,0 +1,23 @@
+Type 1, Exp 76
+++
+"bbdbadbacddbdcbd"
+"cddcdcacccdbdabb"
+"badbaaadaddbccda"
+"bcdbadabbdcbcdc"
+"bcbcdcabcbadbdbb"
+"cabaaaaddcdcccda"
+"abdccacdcaccaacd"
+"acadbbcbbaabdbda"
+"cbdbddbddbdccca"
+"bbbcbacbcddddcdc"
+--
+"bbdddcabddacacb"
+"dcbcbcadaadcddb"
+"badbdadabadcbbdb"
+"cddccabcdbdbcaab"
+"abbcddadbdbbdabb"
+"bcadaacbcaddbd"
+"cabacccddadcccab"
+"cadbcbabcbdcabac"
+"dbacaabdbccbdbc"
+"cdabaaaaaabccadd"

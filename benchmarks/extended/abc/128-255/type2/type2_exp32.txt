@@ -1,0 +1,18 @@
+Type 2, Exp 32
+++
+"cacaabcab"
+"abbca"
+"bbbcbbbb"
+"bbccacbc"
+"ccaca"
+"bccacaa"
+"aabcccacbb"
+--
+"abba"
+"aacaca"
+"cabc"
+"cbbbabbca"
+"abaacaacca"
+"ccacccbcb"
+"abcb"
+"bc"

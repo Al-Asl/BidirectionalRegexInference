@@ -1,0 +1,23 @@
+Type 1, Exp 72
+++
+"abcdabbadcbd"
+"aaddcddcbbb"
+"cbabaddbcdab"
+"dccbabbaacc"
+"adbaccacbaaa"
+"addbbaccbabc"
+"dacaaabccacc"
+"adcbdaadbdba"
+"dccbdadacabb"
+"cbcdbcdcccbc"
+--
+"dcbdbcbbcda"
+"bdbaddabcccd"
+"bddbcddaa"
+"cdcdbaddcdcb"
+"dbcbcbddaccb"
+"cdcaabbdcddc"
+"dacccadbdcab"
+"ddccbdbcc"
+"cacbcdacbbc"
+"dcaaacccbba"

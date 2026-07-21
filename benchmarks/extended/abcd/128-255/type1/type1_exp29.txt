@@ -1,0 +1,18 @@
+Type 1, Exp 29
+++
+"addadb"
+"bdbdca"
+"dadbdd"
+"ddcbda"
+"ddacdc"
+--
+"bcbc"
+"bdccdc"
+"cdcbdb"
+"bbdaad"
+"daaaad"
+"dabdbd"
+"ddddbb"
+"bbdcad"
+"bbbddc"
+"cbcda"

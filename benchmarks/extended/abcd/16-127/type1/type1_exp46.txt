@@ -1,0 +1,12 @@
+Type 1, Exp 46
+++
+"cccbb"
+"aaddc"
+"bcddc"
+"abbac"
+--
+"bcdcad"
+"aabadb"
+"cacddc"
+"bacbcd"
+"bdaacc"

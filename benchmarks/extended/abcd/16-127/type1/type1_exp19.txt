@@ -1,0 +1,15 @@
+Type 1, Exp 19
+++
+"aac"
+"caabc"
+"bdcac"
+"dadbb"
+"adaad"
+"acabd"
+--
+"dbaab"
+"adccb"
+"cadcc"
+"cccca"
+"cdaab"
+"cbcd"

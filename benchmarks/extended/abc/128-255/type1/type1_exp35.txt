@@ -1,0 +1,20 @@
+Type 1, Exp 35
+++
+"ccabba"
+"cbcbabc"
+"ccbaccbb"
+"bacbbbba"
+"ccbaabc"
+"bcbccccb"
+--
+"bbbcacac"
+"cbaabbcc"
+"aabccc"
+"acabaacc"
+"abcbbbb"
+"cbbbaabc"
+"aacbbbbc"
+"baaabcc"
+"cacabcc"
+"ccabacba"
+"bcbbcbc"

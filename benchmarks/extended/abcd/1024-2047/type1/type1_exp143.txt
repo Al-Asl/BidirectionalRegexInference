@@ -1,0 +1,23 @@
+Type 1, Exp 143
+++
+"ccbbddadcbbcbac"
+"abaacbbdbaaabdd"
+"dacccbbaaadbadd"
+"dcbbcbdcaaabbdd"
+"cdcbcbbbdcaccdd"
+"caaacbbdbdadc"
+"cdbaddaccadcddd"
+"babbbbbdbdaddc"
+"acbaaddcdddbbd"
+--
+"addbbacccbcdab"
+"bcacdabdadbdbaa"
+"daacaadcdbbbcac"
+"cbacddbccddadba"
+"bdabbcdcddcacdd"
+"bacdccdccddddc"
+"bdbbbbacadbbb"
+"cacadadbcadcbca"
+"ddabdbdaacbacba"
+"cccccbdbcdbddcd"
+"bcdadaabcbbbbac"

@@ -1,0 +1,20 @@
+Type 1, Exp 33
+++
+"ddbbb"
+"aadcb"
+"dbac"
+"cdbca"
+"dcaab"
+"accd"
+"dacbc"
+--
+"cbcdb"
+"cacc"
+"ddacb"
+"abda"
+"cadca"
+"aaaab"
+"abbcb"
+"dcdcc"
+"dbad"
+"daaa"

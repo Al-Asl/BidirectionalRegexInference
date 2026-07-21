@@ -1,0 +1,23 @@
+Type 2, Exp 99
+++
+"bccba"
+"cbabdbcdbbb"
+"baabaddbdcbc"
+"cbaab"
+"c"
+"ababcabcabcd"
+"babcbacc"
+"bdcccdcadbc"
+"aab"
+--
+"cbaa"
+"b"
+"dacdabacbbbdb"
+"dbb"
+"bbc"
+"bacacaabaca"
+"bacdacbdc"
+"cddccabbaccb"
+"abab"
+"adaddcdbcbbd"
+"addadcacbcaaa"

@@ -1,0 +1,22 @@
+Type 2, Exp 29
+++
+"aaaccdada"
+"dabbaabdcdddba"
+"ccbdadc"
+"baacacccbca"
+"acdcd"
+"babbcbb"
+"aabacdcdabdcbbb"
+"bacdabdbdacdaa"
+"bacd"
+"bcaacaacdcddcdc"
+"acbab"
+--
+"abbbdabaabc"
+"acbdc"
+"cbdccb"
+"bbadadadbdb"
+"aaa"
+"ddcccc"
+"dca"
+"caabbcdba"

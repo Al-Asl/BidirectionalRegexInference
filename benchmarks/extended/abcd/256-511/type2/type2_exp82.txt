@@ -1,0 +1,21 @@
+Type 2, Exp 82
+++
+"ba"
+"cdabcabb"
+"bbccaddcaaaacbc"
+"dcacbabcb"
+"bcccd"
+"abccadbaabddd"
+"cccaccda"
+"bdcdbdcadd"
+--
+"dbbadcac"
+"dbcbc"
+"abdbaaabb"
+"dddaa"
+"dacabc"
+"cbcab"
+"adcdbaddd"
+"adbddcaaadcc"
+""
+"aabadbaa"

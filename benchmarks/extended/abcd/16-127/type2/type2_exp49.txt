@@ -1,0 +1,19 @@
+Type 2, Exp 49
+++
+"dc"
+"cdd"
+"dccd"
+"bc"
+"a"
+"ca"
+"ddb"
+--
+"accd"
+"d"
+"ac"
+""
+"dabd"
+"b"
+"c"
+"dcd"
+"cbc"

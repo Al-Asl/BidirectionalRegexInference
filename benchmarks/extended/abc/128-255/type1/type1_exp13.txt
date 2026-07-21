@@ -1,0 +1,18 @@
+Type 1, Exp 13
+++
+"ccbaccb"
+"abbba"
+"acabbbc"
+"bcbccac"
+"acbcaa"
+"abcacba"
+"caacbbc"
+--
+"cacbb"
+"aabbbaa"
+"ababbac"
+"cbcbbaa"
+"abaaac"
+"ccbcab"
+"cacaaaa"
+"baabacb"

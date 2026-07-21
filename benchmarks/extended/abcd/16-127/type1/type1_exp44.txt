@@ -1,0 +1,19 @@
+Type 1, Exp 44
+++
+"badab"
+"bbb"
+"dcad"
+"badda"
+"aadcc"
+"ccaab"
+"caada"
+"bdcbb"
+"adbca"
+--
+"daac"
+"cacbd"
+"ababb"
+"aacca"
+"cdbd"
+"bccb"
+"dcbbc"

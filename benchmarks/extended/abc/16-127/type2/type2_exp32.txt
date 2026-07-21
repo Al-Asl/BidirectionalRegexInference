@@ -1,0 +1,16 @@
+Type 2, Exp 32
+++
+"cba"
+"cc"
+"bb"
+"ab"
+"bbcbcc"
+"baab"
+--
+"c"
+""
+"ba"
+"abab"
+"babab"
+"acb"
+"ca"

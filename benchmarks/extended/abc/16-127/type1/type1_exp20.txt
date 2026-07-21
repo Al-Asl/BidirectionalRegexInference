@@ -1,0 +1,11 @@
+Type 1, Exp 20
+++
+"ccb"
+"cab"
+"bcaa"
+"ab"
+--
+"abba"
+"caba"
+"bcac"
+"acbc"

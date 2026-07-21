@@ -1,0 +1,22 @@
+Type 2, Exp 19
+++
+"cb"
+"bddcaaa"
+"baddbab"
+"abbdaacd"
+"dbacdcaaca"
+"cd"
+"ad"
+"adcabd"
+"cdb"
+"dddddb"
+--
+"b"
+"dbbbdaadd"
+"ddcdd"
+""
+"cdcdddcc"
+"cdaaaccb"
+"bbdb"
+"acd"
+"aabdaaccb"

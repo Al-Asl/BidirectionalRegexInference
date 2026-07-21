@@ -1,0 +1,22 @@
+Type 1, Exp 56
+++
+"bcbcbababacacabab"
+"bcbaacabaaabbccba"
+"cabcbacbaccaccabb"
+"bcabbbababacaacabc"
+"bbacaacbcbbaacbac"
+"acaccbabacbbccbb"
+"bbacbaccbaabbacbcb"
+"cabaabcababaaacca"
+"acaaabacaabccacabb"
+--
+"bbaabacccabababaca"
+"cbccbbaaacccbbabc"
+"caababbcbbacabaacb"
+"acbabaabbacbbcaaaa"
+"acaaccccccabbbbc"
+"babacbaccaaaaabbba"
+"aabbbbaabcbcccacba"
+"aaaccbaabcbbaacbcc"
+"babaabbacaccbbbabb"
+"aaccacabbbbaaaaabc"

@@ -1,0 +1,20 @@
+Type 1, Exp 26
+++
+"baaabbaa"
+"bbacaaab"
+"aacccbcb"
+"cbbaaacb"
+"bacbacaa"
+"ccbbccc"
+"bcbacaaa"
+"acbaaaca"
+--
+"aabac"
+"bbcacbc"
+"cccbab"
+"bccacccc"
+"babcccab"
+"aaacbbcc"
+"cbacbcbb"
+"caaabbcc"
+"aabbccbc"

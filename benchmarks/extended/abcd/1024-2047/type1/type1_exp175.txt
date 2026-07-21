@@ -1,0 +1,23 @@
+Type 1, Exp 175
+++
+"ccdbadcbcbabcca"
+"cbacaccddcacacb"
+"addcbccadabcab"
+"bcbbbdaaabbbbad"
+"bbcbcdcdadcdaac"
+"abcbbabaadbbcd"
+"bcbadaacbcadaca"
+"bcacacddaacbdac"
+"bcbddbbbbdcacba"
+"dcacccdababacdc"
+--
+"dbcabbbadadbcdd"
+"cdbdbcacabccadc"
+"bbdccddabacabab"
+"acdbaddbcacbccc"
+"acdddbabdadbaad"
+"bababaacaddabad"
+"aacbabcabddcdad"
+"dbbacacdacbdaca"
+"bbbccbaddcabdda"
+"dacbbacbcaccaa"

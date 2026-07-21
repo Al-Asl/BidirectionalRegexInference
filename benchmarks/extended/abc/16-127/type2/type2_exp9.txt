@@ -1,0 +1,14 @@
+Type 2, Exp 9
+++
+"acbc"
+"b"
+"bc"
+"aab"
+""
+--
+"bbca"
+"ac"
+"a"
+"bbcc"
+"aa"
+"aaba"

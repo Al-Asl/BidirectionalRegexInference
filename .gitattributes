@@ -1,3 +1,4 @@
 *.etl filter=lfs diff=lfs merge=lfs -text
 *.nsys-rep filter=lfs diff=lfs merge=lfs -text
 *.ncu-rep filter=lfs diff=lfs merge=lfs -text
+*.json filter=lfs diff=lfs merge=lfs -text

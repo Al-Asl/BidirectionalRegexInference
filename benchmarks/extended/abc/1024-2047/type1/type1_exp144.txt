@@ -1,0 +1,23 @@
+Type 1, Exp 144
+++
+"abbacaccacbcbcaa"
+"cbacabbccaacaabac"
+"babcacbabbcacaaac"
+"cacacbccbacbcabcb"
+"ccccaabcabccacaaa"
+"bbcaaaaabcabcbcaa"
+"abccbabacacbacbca"
+"accabcbabcacaacbb"
+"abccbaaccacbcbbaa"
+"caacbacaacbbabcaa"
+--
+"baacabacccbbbcccb"
+"bcbbbcaaaaaacacbb"
+"cacabacaabcbccacc"
+"bbbbcbbaaabbbcbac"
+"acbbabbcbbccababc"
+"accbbbacabbcbccba"
+"babacaababcbcaca"
+"acbabbbbccaacbcab"
+"ccbccabccccaabaab"
+"cbbcaccccacaccaa"

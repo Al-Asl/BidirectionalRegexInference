@@ -1,0 +1,21 @@
+Type 2, Exp 57
+++
+"baccadbbad"
+"ad"
+"dcaccacacac"
+"bbbabdac"
+"cabcbcaa"
+"aaddaddbacb"
+"dbdcda"
+"bbc"
+"caccdbc"
+"abb"
+--
+"dcbacddcabca"
+"ab"
+"b"
+"aabbddbddddb"
+""
+"ddcd"
+"dcaddca"
+"a"

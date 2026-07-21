@@ -1,0 +1,23 @@
+Type 2, Exp 61
+++
+"cbacdabdaccdac"
+"cdcdaccddacc"
+"baad"
+"daaabcccacbddddbcb"
+"dbabbbbcaca"
+"bcacadadbd"
+"dbccbdbccdadbaab"
+"daaacbd"
+"dcdddddabd"
+"bbbacbdb"
+"ddbddbddcbd"
+--
+"bdbbcadbdbccdb"
+"dbbbdbacacbbac"
+"aacbdddddcb"
+"cbbbbddca"
+"dadccdbbddbbaddabdb"
+"abdaadabdccdc"
+"bccbbb"
+"dacdaad"
+""

@@ -1,0 +1,18 @@
+Type 1, Exp 23
+++
+"abda"
+"ddaab"
+"acab"
+"ddcac"
+"cbaba"
+"aabad"
+"adaca"
+"dac"
+"bcaba"
+--
+"cbbc"
+"dabdd"
+"dbcca"
+"dbcc"
+"dccdd"
+"dbabc"

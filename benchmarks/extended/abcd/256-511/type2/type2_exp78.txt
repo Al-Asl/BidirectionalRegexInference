@@ -1,0 +1,23 @@
+Type 2, Exp 78
+++
+"cbbdcab"
+"c"
+"cbd"
+"ddb"
+"aabcdabdddaaa"
+"bcddcac"
+"ab"
+"bacbcdabbccab"
+"cccb"
+"daaddcaacb"
+"aa"
+--
+"bac"
+"baacccabbbddd"
+"bccaacac"
+"cacbaddcbcba"
+"ddbbadacbca"
+"ddbd"
+"dbaaddaddaa"
+"acabbbabcc"
+"ddbbad"

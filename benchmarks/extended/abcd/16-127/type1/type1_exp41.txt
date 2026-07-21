@@ -1,0 +1,20 @@
+Type 1, Exp 41
+++
+"cdaa"
+"dcda"
+"dcdb"
+"dccd"
+"bcaa"
+"adaa"
+"bbbc"
+"cccd"
+--
+"dcdc"
+"cdd"
+"bdaa"
+"ccdd"
+"acca"
+"ddc"
+"bddd"
+"dbd"
+"ccdb"

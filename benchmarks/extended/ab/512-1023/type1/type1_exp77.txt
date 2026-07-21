@@ -1,0 +1,22 @@
+Type 1, Exp 77
+++
+"abbaaaaaabbaba"
+"aaababaababbba"
+"aababbbbabaaaa"
+"bbbbbbaaabba"
+"abbbbbaabbaaaa"
+"bbbaababaabaaa"
+"aaabaabaaaabba"
+"aaabaabaababaa"
+"bbabaaaabbb"
+--
+"babbaaaaabaaab"
+"baabababbbbbbb"
+"bbbbaabbababab"
+"aabbbbbabaabaa"
+"bbbaaaaabbbbaa"
+"bbaabbbabaaaa"
+"abaababa"
+"babbabaaababa"
+"ababbabaabbbab"
+"bbbababbbbab"

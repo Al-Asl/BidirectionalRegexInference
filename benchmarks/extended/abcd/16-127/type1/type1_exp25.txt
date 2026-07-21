@@ -1,0 +1,21 @@
+Type 1, Exp 25
+++
+"dcddb"
+"bcbaa"
+"acad"
+"aadd"
+"adaab"
+"ddbdc"
+"bacad"
+"ccbd"
+--
+"acaca"
+"bab"
+"abcaa"
+"dcccb"
+"aabdd"
+"adabc"
+"aaada"
+"acbd"
+"bbbbd"
+"abdaa"

@@ -1,0 +1,23 @@
+Type 2, Exp 35
+++
+"dbbcac"
+"cbcd"
+"addddd"
+"addbbdc"
+"dbbccac"
+"c"
+"aaa"
+"a"
+"aacbd"
+"ad"
+""
+--
+"bbd"
+"cac"
+"caac"
+"ddcad"
+"dbbba"
+"b"
+"bbcdbd"
+"d"
+"babbd"

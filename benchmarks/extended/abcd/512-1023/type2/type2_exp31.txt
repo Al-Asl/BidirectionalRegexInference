@@ -1,0 +1,23 @@
+Type 2, Exp 31
+++
+"daadaaddabcdca"
+"abbadaaddcbdbdd"
+"a"
+"bdaaabb"
+"ddccdb"
+"bbcdbcaccbb"
+"aacaadacbc"
+"bacc"
+"bdccdcca"
+"cbbadbcdddccab"
+--
+"dbbdbccaacdbcc"
+"ccbc"
+"ababc"
+"bccccaadbaaddd"
+"ddbaabbbbabccbdaddc"
+"bdbdbcdd"
+"ccadcdacbcccbd"
+"ddcdacddbcac"
+"ddacaccbcbda"
+"abdabbcadacda"

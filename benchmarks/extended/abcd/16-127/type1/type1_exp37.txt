@@ -1,0 +1,14 @@
+Type 1, Exp 37
+++
+"ccbda"
+"aabbd"
+"baacc"
+"bcaba"
+"dbacc"
+--
+"ddbaa"
+"dbccd"
+"adbbb"
+"bcdda"
+"cdbcd"
+"dabba"

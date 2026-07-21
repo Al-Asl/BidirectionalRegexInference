@@ -1,0 +1,21 @@
+Type 1, Exp 100
+++
+"aaaabababbbcaa"
+"caabbbcac"
+"acbaaacabaccbb"
+"bcaccbcbcbacba"
+"bacbacabccaaaa"
+"babbcaababcbb"
+"bccaacbbbcaab"
+"bbabcbcaccaacc"
+"baaabbcbacabb"
+--
+"aacbbcccbcabcb"
+"bbaacbbccabbc"
+"aacabaaaabcc"
+"acbbbaabacccba"
+"cabccbacabaca"
+"aaccccbbccccaa"
+"cbbacacccacbac"
+"abababaacabbc"
+"cbaaccacbbcc"

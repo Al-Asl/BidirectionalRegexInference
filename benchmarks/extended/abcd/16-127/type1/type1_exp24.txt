@@ -1,0 +1,20 @@
+Type 1, Exp 24
+++
+"dcaa"
+"bcdc"
+"bcb"
+"dbaa"
+"dddb"
+"bada"
+"caba"
+"bcad"
+"cda"
+"bbda"
+"ada"
+--
+"daad"
+"cbda"
+"cbd"
+"bbdd"
+"badd"
+"bd"

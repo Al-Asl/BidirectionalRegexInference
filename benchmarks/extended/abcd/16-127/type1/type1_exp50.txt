@@ -1,0 +1,21 @@
+Type 1, Exp 50
+++
+"caad"
+"daba"
+"ddba"
+"dad"
+"dcca"
+"ddc"
+"aabc"
+"dbc"
+--
+"cda"
+"cca"
+"adbb"
+"adcd"
+"dd"
+"cabd"
+"ccdd"
+"dacc"
+"acba"
+"dbcb"

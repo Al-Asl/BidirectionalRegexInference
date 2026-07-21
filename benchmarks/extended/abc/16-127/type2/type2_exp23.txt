@@ -1,0 +1,19 @@
+Type 2, Exp 23
+++
+"cacb"
+"ca"
+"cbca"
+"cbc"
+"abc"
+"acba"
+"aa"
+"ccaa"
+"cb"
+"bac"
+--
+""
+"b"
+"a"
+"cabb"
+"bbc"
+"ac"

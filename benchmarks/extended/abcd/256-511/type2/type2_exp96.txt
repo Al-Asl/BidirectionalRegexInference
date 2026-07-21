@@ -1,0 +1,20 @@
+Type 2, Exp 96
+++
+"dcbbcddc"
+"abcacbbdca"
+"adbccaccaadbdc"
+"aacddcccadc"
+""
+"abaacba"
+"abddcdacaab"
+"a"
+"bab"
+--
+"cdcaaabc"
+"cdcb"
+"bddbdbc"
+"cddbdbcccbbbbb"
+"bdabddcdaaccbd"
+"dabad"
+"bcbdc"
+"b"

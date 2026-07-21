@@ -1,0 +1,18 @@
+Type 2, Exp 14
+++
+"aba"
+"bbba"
+"bbaa"
+"babaa"
+"babb"
+"a"
+"aab"
+--
+"abb"
+"bbabb"
+"abba"
+""
+"aa"
+"bb"
+"ab"
+"baa"

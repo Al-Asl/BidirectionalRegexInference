@@ -1,0 +1,19 @@
+Type 1, Exp 11
+++
+"cccc"
+"cbaa"
+"acaa"
+"bcbac"
+""
+"bcbcb"
+"aca"
+"cbaaa"
+--
+"bca"
+"cacab"
+"acccc"
+"cccbc"
+"babb"
+"aaaab"
+"baa"
+"aabbb"

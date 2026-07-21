@@ -1,0 +1,15 @@
+Type 1, Exp 5
+++
+"acbac"
+"ccaac"
+"baaab"
+"acacc"
+"bacb"
+"cabca"
+"c"
+--
+"bbcca"
+"abcca"
+""
+"aaabc"
+"cbab"

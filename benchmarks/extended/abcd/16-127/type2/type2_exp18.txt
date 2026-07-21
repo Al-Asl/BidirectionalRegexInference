@@ -1,0 +1,22 @@
+Type 2, Exp 18
+++
+"c"
+"bac"
+"ab"
+"cddbb"
+""
+"dbca"
+"b"
+"cdbd"
+"acda"
+--
+"bb"
+"caad"
+"a"
+"aad"
+"dcacd"
+"bdac"
+"ac"
+"acdbbc"
+"dbdd"
+"bcaadba"

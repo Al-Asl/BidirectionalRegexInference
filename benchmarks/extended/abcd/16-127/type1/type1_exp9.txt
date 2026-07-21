@@ -1,0 +1,21 @@
+Type 1, Exp 9
+++
+"dccaa"
+"ddab"
+"abdbc"
+"daccd"
+"aadda"
+"dadaa"
+"aacb"
+--
+"dddbb"
+"abbbc"
+"dcbab"
+"dbdbc"
+"adcdd"
+"caccc"
+"dbccb"
+"cadb"
+"bbbba"
+"addd"
+"cbacc"

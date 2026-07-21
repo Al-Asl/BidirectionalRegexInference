@@ -1,0 +1,21 @@
+Type 2, Exp 198
+++
+"b"
+"caaaaaddbcabbdabacc"
+"addadcacd"
+"abaabc"
+"dccabdbcbccabaaaa"
+"aacacccddbdcbabab"
+"bcbabad"
+"acbcdcbcd"
+"bddacddccabccbbddbaa"
+--
+"abbbdccabcacac"
+"bcdcbcdbbdcbbcdabac"
+"ca"
+"ddacbbddbb"
+"adabcbbabdb"
+"aacaabdddcdbbcdadddcc"
+"ccbca"
+"dabbbcabd"
+"db"

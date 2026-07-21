@@ -1,0 +1,23 @@
+Type 2, Exp 99
+++
+"bbaaaaaabbbbaaaab"
+"aabbaaa"
+"aaaaa"
+"bbbabbb"
+"bbbbbabaabbb"
+"bbb"
+"abbbbab"
+"bbaaaabbaab"
+--
+"a"
+"bbbb"
+"bbaaa"
+"baaabbbbaababbbaba"
+"aabaabbbbbaaaaa"
+"bb"
+"bbbbbababaa"
+"aaaabaaabb"
+"babaa"
+"ababbbaaabbba"
+"abaaabbbbba"
+"aaabababbaba"

@@ -1,0 +1,20 @@
+Type 2, Exp 33
+++
+"aaaba"
+"babb"
+"aba"
+"a"
+"abb"
+"bbb"
+"bb"
+"bbaab"
+"bbba"
+"aa"
+--
+"ab"
+"aaaaa"
+""
+"ba"
+"abab"
+"b"
+"baabb"

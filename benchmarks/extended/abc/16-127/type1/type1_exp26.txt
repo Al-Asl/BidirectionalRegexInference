@@ -1,0 +1,14 @@
+Type 1, Exp 26
+++
+"bcab"
+"acba"
+"cac"
+"abbc"
+"aaca"
+--
+"cabc"
+"cccb"
+"cbab"
+"cab"
+"c"
+"baa"

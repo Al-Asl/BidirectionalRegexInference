@@ -1,0 +1,12 @@
+Type 1, Exp 47
+++
+"daca"
+"caad"
+"cccaa"
+"aaba"
+--
+"ddac"
+"cdcc"
+"dbcaa"
+"aacbc"
+"cdaad"

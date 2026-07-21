@@ -1,0 +1,22 @@
+Type 2, Exp 47
+++
+"dacc"
+""
+"b"
+"dcbd"
+"ddb"
+"cdaad"
+"a"
+"cad"
+"abdcd"
+--
+"c"
+"cddd"
+"d"
+"bdd"
+"dd"
+"dddca"
+"bcb"
+"db"
+"bdcca"
+"bbc"

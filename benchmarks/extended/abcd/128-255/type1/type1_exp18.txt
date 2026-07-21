@@ -1,0 +1,20 @@
+Type 1, Exp 18
+++
+"acbddb"
+"dcdbc"
+"dbdaba"
+"daabdc"
+"ddabbb"
+"cdaabc"
+"ddacc"
+"adcddc"
+"dddbcc"
+"ddadcb"
+"bccbcb"
+--
+"adddcb"
+"dadbdc"
+"cdbbda"
+"bcaca"
+"bcccba"
+"aaccbd"

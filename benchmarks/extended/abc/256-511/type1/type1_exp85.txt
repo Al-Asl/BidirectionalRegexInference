@@ -1,0 +1,22 @@
+Type 1, Exp 85
+++
+"baccbb"
+"caacccbb"
+"accbbccbc"
+"bcbbcbbba"
+"abbbcacc"
+"abbabbbba"
+"caaaacbcc"
+"baccbcbbc"
+--
+"babccaa"
+"ccbabccab"
+"accbaabaa"
+"abccccc"
+"abbaccc"
+"bccabaaac"
+"bcccbabba"
+"bcacaacac"
+"ccccccbab"
+"abaabcacc"
+"bbbbacca"

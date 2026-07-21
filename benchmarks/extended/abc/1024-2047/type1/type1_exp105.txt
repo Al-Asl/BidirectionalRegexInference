@@ -1,0 +1,23 @@
+Type 1, Exp 105
+++
+"cabbbbbabcaacacb"
+"acabacacaccbaaac"
+"caabbccbbcbcaaac"
+"bbababcbacaabbaa"
+"acacaaccabcbbabb"
+"aacccabcacbbbc"
+"cbcbacbabbccaba"
+"cccacbaaaaabbcac"
+"accbcaaabccccabc"
+"cabcbabcbccccccc"
+"abccbcbbbbcbabc"
+--
+"bbbbacbcacaaacab"
+"cabccabbaabacabc"
+"abcaccacbcbccaba"
+"cbccaccacbbbbaac"
+"ccbcbcbcbccbbcac"
+"cabbbaaccbaccb"
+"bbabaaabacccbcba"
+"bcbbbcaaccaacabc"
+"cacbcaccbcbcaca"

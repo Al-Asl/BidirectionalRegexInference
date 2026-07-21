@@ -1,0 +1,23 @@
+Type 1, Exp 39
+++
+"aaaabaaccabba"
+"caaaababcbcbb"
+"cbcabbcaabcbb"
+"ccaaacabaaac"
+"cbaabbbcccbb"
+"ccaaabbccbcac"
+"bbbbbabacabbb"
+"baaababbbacb"
+--
+"caabaaabbbabb"
+"cabacaaabacaa"
+"cabcbaaacbbc"
+"cbaaaccabaccb"
+"abccbbaabcbcc"
+"accbbbcbcbcc"
+"ccbcbaabcccca"
+"aaabcabcbcaba"
+"accabbabbacb"
+"caacaaabbab"
+"bccccbcacbcbc"
+"cabbbbacbbbcc"

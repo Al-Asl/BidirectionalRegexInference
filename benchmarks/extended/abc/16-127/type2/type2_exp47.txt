@@ -1,0 +1,20 @@
+Type 2, Exp 47
+++
+"baaa"
+"ba"
+"accc"
+"cbc"
+"b"
+"cacc"
+"a"
+--
+"bb"
+"aacb"
+"c"
+"baa"
+"ab"
+""
+"ac"
+"bbb"
+"cbbc"
+"bac"

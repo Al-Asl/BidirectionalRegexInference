@@ -1,0 +1,19 @@
+Type 2, Exp 7
+++
+"adaca"
+"adaaddca"
+"abadc"
+"dbcbacdbba"
+"dbbccddaac"
+"bac"
+"bcbdadddadab"
+"cc"
+"adadccdbda"
+--
+"dacba"
+"cdbd"
+"adaccdabb"
+"bcd"
+"babdadb"
+"acb"
+""

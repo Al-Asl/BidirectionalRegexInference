@@ -1,0 +1,23 @@
+Type 2, Exp 81
+++
+"bcabccccaac"
+"aabbab"
+"abbccbbbb"
+"accbcbbcbccc"
+"cbbbaaaccc"
+"cbcccca"
+"baabbccb"
+"cbcbb"
+"cbbcbcca"
+"b"
+"bccabac"
+"acccabc"
+--
+"ccaa"
+"acccbbbacbab"
+"bcc"
+"bca"
+"bcbccabbcac"
+"c"
+"bcacbc"
+"cb"

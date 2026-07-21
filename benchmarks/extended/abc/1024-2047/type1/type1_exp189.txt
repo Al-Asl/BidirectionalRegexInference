@@ -1,0 +1,23 @@
+Type 1, Exp 189
+++
+"cacccaaccacaabb"
+"baaababacaaacbb"
+"aabcaabaacbbbac"
+"bcacbccacbacacb"
+"caabcacbcbabbaa"
+"bbccbcaaaaabca"
+"bccaaabbacbcbc"
+"cbbacbcacbababc"
+"baacccbcbccbbcc"
+"abbcaabaabcca"
+"aabaaccacabbba"
+--
+"abcacbbaccbcaab"
+"bbccbabacabbca"
+"ccaacabbacaaab"
+"bcacbabcbaaacbc"
+"bbaaabaabaaabbb"
+"ccccccabbacaca"
+"bccbcaabbbacbb"
+"bbcacccbcccbbbc"
+"ababacbaaabbacc"

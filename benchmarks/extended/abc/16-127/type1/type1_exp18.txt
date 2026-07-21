@@ -1,0 +1,19 @@
+Type 1, Exp 18
+++
+"cbc"
+"aacb"
+"cabb"
+"cbca"
+"acbc"
+"babc"
+"abcb"
+--
+"acab"
+"ccaa"
+"bcab"
+"bbcb"
+"c"
+"bbc"
+"cacb"
+"ccca"
+"bbba"

@@ -1,0 +1,23 @@
+Type 1, Exp 10
+++
+"cdbdbbbcdcdca"
+"bdcddbcaadcac"
+"daabadbbcccc"
+"acdabaacaadbb"
+"cdcbabbbcdcbd"
+"bdcbdabbaccb"
+"cabbbadbadbb"
+"dbdbcdddcac"
+--
+"aadabaccabdc"
+"abbacadabacac"
+"caccdcbdcaabb"
+"cbabbbadbdadb"
+"ccbbdababcdbb"
+"ddcccacababbc"
+"cdcabccdcabdd"
+"dabcbdcdaaadd"
+"cacbcddbcbca"
+"bbadccdbacdcd"
+"cadddcaccdcbb"
+"cdbadbadcabda"

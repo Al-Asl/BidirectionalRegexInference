@@ -1,0 +1,20 @@
+Type 2, Exp 71
+++
+"ccbcbbcca"
+"bbcbabbac"
+"bcbcbb"
+"cccbabccaac"
+"ccaacbacac"
+"cbcbaca"
+"accabcccb"
+"bac"
+"cbcbcccbbbcb"
+--
+"b"
+"bb"
+"acc"
+"aabcccbcbbb"
+"bbbbcaabcacbc"
+"acbbcbbbbb"
+"cacbaa"
+"c"

@@ -1,0 +1,23 @@
+Type 1, Exp 125
+++
+"aabbcacacccac"
+"caaaacbccbbbba"
+"aaacaaacbabbab"
+"babaaaaacbacb"
+"bbcaaabbabcc"
+"cacccccacaaacb"
+"babacccbcbccbb"
+"aacaccbcccab"
+"cbabcccbaacca"
+--
+"babaaaccaccabb"
+"bbbcbaabacaab"
+"bbabbababacacb"
+"cbbaccaaacacaa"
+"bccbbbabacaaca"
+"abcacccabcaaca"
+"cbababbbcbcba"
+"acccbabacaabaa"
+"cccbaccabaaabb"
+"accabbcbaacbcb"
+"caabaacaaacab"

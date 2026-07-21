@@ -1,0 +1,19 @@
+MLReg 04.03.TLT.2.1.0_Train_F16
+++
+"aaaaaacbbdbbdcaadddb"
+"aabbaddcdacbbccbbaab"
+"aaccbbbccbbdbccbcdbd"
+"abaadbbbbdabdddccadc"
+"abbbcaccccdacadbdaaa"
+"abcacabcccaddbbbdcab"
+"abdbdccdabcdabdccdaa"
+"acaddbddbdddacdadbaa"
+--
+"aaaaaabcdcdddcddddca"
+"aaaccbaaadacdcccadcd"
+"aabcddcabddcaacdcccb"
+"aaccbcabaaccdaadaabc"
+"aadbdcaacccbacdaabca"
+"ababcabdcabadbaadcbd"
+"abcbcaaddcabaddddbdc"
+"abdcbadbaaccbadbcdda"

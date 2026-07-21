@@ -1,0 +1,17 @@
+Type 1, Exp 20
+++
+"ccadd"
+"acacc"
+"baa"
+"abba"
+"dccca"
+"ccb"
+"bdcc"
+--
+"dccdb"
+"adbaa"
+"adadc"
+"cdbcb"
+"abbdc"
+"bdccd"
+"bcaaa"

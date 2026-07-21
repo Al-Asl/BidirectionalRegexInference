@@ -1,0 +1,21 @@
+Type 1, Exp 77
+++
+"dcabaccddddd"
+"dcccaddcaaad"
+"ddabaadcadab"
+"cacaacbdada"
+"daaccdbbccab"
+"ddcacabdbdcb"
+"ddcadcadcbad"
+"cdbdbcdcbaac"
+"dabaaccccbaa"
+--
+"bddbddadaab"
+"adacdbdabab"
+"dcdbaabbbcd"
+"dbacadbcdbbb"
+"dbbaadbdbbaa"
+"bbbbbdbbcbdd"
+"bbcbdcabaaad"
+"aabcaadddbcb"
+"dcbdcdcdbbda"

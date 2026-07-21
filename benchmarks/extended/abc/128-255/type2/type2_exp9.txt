@@ -1,0 +1,21 @@
+Type 2, Exp 9
+++
+"bcbbabcccc"
+"cbcb"
+"cccccb"
+"ccaccc"
+"ccccbbcc"
+"abcacbb"
+"c"
+"aacaccbac"
+"bbbccacbac"
+"cbcbacb"
+"acaaccb"
+--
+"cbb"
+"aaaabaab"
+"accccbccb"
+"aca"
+"b"
+"bacbababa"
+""

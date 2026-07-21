@@ -1,0 +1,13 @@
+Type 1, Exp 14
+++
+"bdbc"
+"adbd"
+"ddad"
+"dcaa"
+"bcbc"
+--
+"bbdb"
+"bcaa"
+"bdcc"
+"cab"
+"aada"

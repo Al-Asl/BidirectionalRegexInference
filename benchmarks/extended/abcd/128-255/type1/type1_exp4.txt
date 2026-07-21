@@ -1,0 +1,22 @@
+Type 1, Exp 4
+++
+"dbddc"
+"aadacc"
+"adcdad"
+"dbbada"
+"baadaa"
+"cbdddb"
+"acacdd"
+"aaddbc"
+"adbcdd"
+"bbcabc"
+"ddddaa"
+"dddcaa"
+--
+"bbbddd"
+"bdabdb"
+"bdbda"
+"bdcddb"
+"abcaaa"
+"dcacbc"
+"ccbacb"

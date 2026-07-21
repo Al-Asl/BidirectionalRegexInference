@@ -1,0 +1,17 @@
+Type 2, Exp 13
+++
+"baaaa"
+"ab"
+"cb"
+"cc"
+"bca"
+"a"
+"bbca"
+"cbaccaa"
+--
+"baa"
+"cccbbac"
+"ba"
+"babc"
+"baccc"
+"aaaa"

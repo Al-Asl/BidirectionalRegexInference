@@ -1,0 +1,16 @@
+Type 2, Exp 13
+++
+"c"
+"cad"
+"bbbdc"
+"bbacab"
+"ccaadb"
+"ac"
+"ccbac"
+"dc"
+--
+"dac"
+""
+"a"
+"dbcdc"
+"dab"

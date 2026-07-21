@@ -1,0 +1,23 @@
+Type 2, Exp 56
+++
+"bacc"
+"acbbcaaabacccbb"
+"cbbaaaacbaabcbaacc"
+"baccaacabaab"
+"ab"
+"acbaca"
+"cbabc"
+"abbbabbbacababb"
+"bbbcbb"
+"babcabcabcbabca"
+--
+"acbcaaabbccbbbaaa"
+"acaa"
+"bcbcccccbcacb"
+"bcccccba"
+"bcabaccbaaacccab"
+"aaabcaabaababbaca"
+"bbabbcaccbbaccccb"
+"bbaabbcccc"
+"accbacbabc"
+"babab"

@@ -1,0 +1,19 @@
+Type 2, Exp 23
+++
+"aacbbcca"
+"aabbbacbbcca"
+"bbabccaaa"
+"ac"
+"caa"
+"bacbabaccb"
+"bcccba"
+--
+"cbb"
+"cbbb"
+""
+"cbcaaccbb"
+"cbaccbcc"
+"bbb"
+"cabbccababbc"
+"accabacaaba"
+"aabccbaaacc"

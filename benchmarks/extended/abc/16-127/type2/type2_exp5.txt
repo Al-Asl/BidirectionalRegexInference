@@ -1,0 +1,21 @@
+Type 2, Exp 5
+++
+"abc"
+"aacc"
+"cab"
+""
+"cac"
+"cb"
+"a"
+"baba"
+--
+"ccba"
+"b"
+"ccac"
+"aaac"
+"aaa"
+"ca"
+"ac"
+"bc"
+"bb"
+"baca"

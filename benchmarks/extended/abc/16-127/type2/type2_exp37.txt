@@ -1,0 +1,19 @@
+Type 2, Exp 37
+++
+"caccaac"
+"abc"
+"cca"
+"aabcbcba"
+""
+"bbacb"
+"bba"
+--
+"bccbbbc"
+"aaacbaacc"
+"cb"
+"babbaa"
+"c"
+"aabcbc"
+"bbcb"
+"bacc"
+"b"

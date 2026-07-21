@@ -1,0 +1,13 @@
+Type 2, Exp 5
+++
+""
+"cababbacc"
+"c"
+"b"
+"bccc"
+--
+"baaababa"
+"accabcacbaaa"
+"aacaabaac"
+"aacacaa"
+"cbcacac"

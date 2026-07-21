@@ -1,0 +1,21 @@
+Type 1, Exp 89
+++
+"ddadacabda"
+"cdaadadacd"
+"bccbdbdcc"
+"adaacbbad"
+"bdbdadacbb"
+"accadadcba"
+"dcddcabdcc"
+"dcabccbdbb"
+--
+"ccbbccbcdd"
+"cbbbabacda"
+"cbcbdacbba"
+"dacdbcbada"
+"babababbab"
+"bdaaabadbb"
+"cbdaadaac"
+"acdcdbacaa"
+"bddcaadcdc"
+"bbdcccadac"

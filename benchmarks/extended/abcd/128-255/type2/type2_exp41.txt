@@ -1,0 +1,15 @@
+Type 2, Exp 41
+++
+"bdacddba"
+"adcabd"
+"daabcdca"
+"aabaac"
+"dda"
+"ccadbad"
+--
+"bcad"
+"bdbbbadc"
+"ad"
+"adbcbabb"
+"bbc"
+""

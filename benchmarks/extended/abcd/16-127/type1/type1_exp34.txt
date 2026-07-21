@@ -1,0 +1,13 @@
+Type 1, Exp 34
+++
+"cbc"
+"dad"
+"cdcc"
+"dcbd"
+"daab"
+--
+"cdad"
+"caac"
+"caab"
+"ccba"
+"aabb"

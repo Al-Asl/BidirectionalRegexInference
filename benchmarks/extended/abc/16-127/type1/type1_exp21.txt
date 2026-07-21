@@ -1,0 +1,16 @@
+Type 1, Exp 21
+++
+"bbac"
+"aca"
+"cccc"
+"bccb"
+--
+"ca"
+"baac"
+"acbc"
+"aaa"
+"ab"
+"bcbb"
+"bcc"
+"acac"
+"cacb"

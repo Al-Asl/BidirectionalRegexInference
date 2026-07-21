@@ -1,0 +1,11 @@
+Type 2, Exp 11
+++
+""
+"bcac"
+"cc"
+"cbbbab"
+--
+"bcccca"
+"bacbbc"
+"ccacac"
+"bbbba"

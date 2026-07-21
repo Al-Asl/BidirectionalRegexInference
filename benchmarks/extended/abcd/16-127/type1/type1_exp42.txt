@@ -1,0 +1,19 @@
+Type 1, Exp 42
+++
+"bdbc"
+"daad"
+"ccab"
+"dddc"
+"badd"
+"abcd"
+"ddbd"
+--
+"cdad"
+"cbbc"
+"daab"
+"abda"
+"bddb"
+"ddda"
+"dbd"
+"bdac"
+"bbcc"

@@ -1,0 +1,21 @@
+Type 2, Exp 93
+++
+"dbdccccbaaadbbbaabb"
+"dddcdbaddcaabcdabbdab"
+"ddda"
+"caccba"
+"ddbcbdbabdcbddcbadda"
+"babaddbacbdcacdddc"
+"daccadaadaaccbcdc"
+"ddacbaabdcb"
+"bcdaaadbbbdcd"
+--
+"ab"
+"cadccaddaaaddbddddaacbd"
+"bcddb"
+"bddadbccadbabbacdcdbc"
+"cbadcbadaabacbc"
+"bdbadcbcdcdabbcb"
+"dbcdbaabcbbbbbcbcddcdb"
+"cababdbacd"
+"dbadadcacdaccacb"

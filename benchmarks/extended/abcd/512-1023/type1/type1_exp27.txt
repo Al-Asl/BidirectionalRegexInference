@@ -1,0 +1,23 @@
+Type 1, Exp 27
+++
+"cbddbbcdcac"
+"bdacbadbbbb"
+"bcdccdbb"
+"aacadcdbad"
+"bbabadbdddc"
+"bbcacdcdadc"
+"caddddbdb"
+"acdccdcdccb"
+"bdcddbbcdd"
+"bddcdcbaaa"
+--
+"cbcabbbaddc"
+"bddbabacdba"
+"bcdbadbccac"
+"cddbdcaadd"
+"caddbcabaaa"
+"dcdbabdcdbd"
+"dcbdabccbb"
+"acbaddbadaa"
+"aacbcbaccbc"
+"cbaababbbbc"

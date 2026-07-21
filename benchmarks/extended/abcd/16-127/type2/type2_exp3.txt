@@ -1,0 +1,19 @@
+Type 2, Exp 3
+++
+"acdb"
+"cbb"
+""
+"da"
+"acd"
+"cacc"
+"c"
+"acba"
+"abdc"
+"a"
+--
+"ba"
+"acdc"
+"dd"
+"cbc"
+"adcb"
+"d"

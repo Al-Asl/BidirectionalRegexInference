@@ -1,0 +1,19 @@
+Type 2, Exp 11
+++
+"ab"
+"caababa"
+"b"
+"bbbbcacccb"
+"aac"
+"a"
+"abc"
+"cab"
+--
+"ca"
+"bbaac"
+"abbcccbccac"
+"abbabac"
+"bbbcc"
+"bababaccbc"
+""
+"ccccaab"

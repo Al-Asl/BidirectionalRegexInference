@@ -1,0 +1,19 @@
+Type 1, Exp 8
+++
+"bdaccb"
+"adcb"
+"bdcadb"
+"ddbcd"
+"bcbdcb"
+"bbbaba"
+"bdbda"
+"bdddac"
+"ababcb"
+--
+"dbaacc"
+"abdbdb"
+"aaaacb"
+"dbddad"
+"bbacca"
+"ddbabc"
+"bdbcab"

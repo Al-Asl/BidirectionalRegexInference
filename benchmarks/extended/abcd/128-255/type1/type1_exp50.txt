@@ -1,0 +1,23 @@
+Type 1, Exp 50
+++
+"adbbbcc"
+"ddadabc"
+"dcccbb"
+"dadcadd"
+"aacaac"
+"adcabbb"
+"ccaabdd"
+"abbbadc"
+"cabba"
+"abcaad"
+"cbaadda"
+--
+"aacaccd"
+"acabdaa"
+"dbddcca"
+"cbcaaab"
+"dabdda"
+"dcbccdc"
+"cbabdcc"
+"bcbccab"
+"bdcddd"

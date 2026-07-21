@@ -1,0 +1,19 @@
+Type 1, Exp 17
+++
+"aaacac"
+"abccba"
+"caabbb"
+"accbb"
+"aabaaa"
+"cabcaa"
+"bbcb"
+--
+"abccbc"
+"cccbbc"
+"cccbba"
+"aaabbc"
+"aabacc"
+"aaccba"
+"cabc"
+"bbbbb"
+"caccac"

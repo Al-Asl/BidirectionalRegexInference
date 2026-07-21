@@ -1,0 +1,11 @@
+MLReg 04.03.TLT.2.1.0_Train_F4
+++
+"aaaaaacbbdbbdcaadddb"
+"aabbaddcdacbbccbbaab"
+"aaccbbbccbbdbccbcdbd"
+"abaadbbbbdabdddccadc"
+--
+"aaaaaabcdcdddcddddca"
+"aaaccbaaadacdcccadcd"
+"aabcddcabddcaacdcccb"
+"aaccbcabaaccdaadaabc"

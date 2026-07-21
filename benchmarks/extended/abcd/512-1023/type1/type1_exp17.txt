@@ -1,0 +1,23 @@
+Type 1, Exp 17
+++
+"dcccbccbab"
+"bbbccbbccd"
+"caaccdaaca"
+"adbdbcbbbb"
+"dccddcacba"
+"dcabcaaacb"
+"aabadabdcc"
+"cbbabdbcaa"
+"cdccdadbcc"
+"dbbabddcac"
+"ddabccdbc"
+--
+"cdcdbbbada"
+"dbabba"
+"dddabbbbcd"
+"caddccaccb"
+"cbaaababbb"
+"cadcbbbccc"
+"aabdaabbb"
+"dccbccadc"
+"cccbcbbdb"

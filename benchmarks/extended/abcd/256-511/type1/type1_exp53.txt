@@ -1,0 +1,21 @@
+Type 1, Exp 53
+++
+"dbddabbb"
+"aadbdbdac"
+"aaadcbad"
+"dabdaadb"
+"adacdcdca"
+"cccbacdb"
+"dbcbdadc"
+"bcdddbbcb"
+"acbacccdd"
+"dddbabacc"
+"dbccbabaa"
+--
+"bccbccbad"
+"cacbcccdc"
+"cdadadadd"
+"bccbdadab"
+"addbbcdda"
+"dacdaaaca"
+"bddbbacd"

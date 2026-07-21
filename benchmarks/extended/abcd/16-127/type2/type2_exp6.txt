@@ -1,0 +1,21 @@
+Type 2, Exp 6
+++
+"dcacd"
+"d"
+"cc"
+"aac"
+"caa"
+"aa"
+"bcbda"
+"ccad"
+--
+"cdba"
+"bbd"
+"ddbcc"
+"c"
+"bdca"
+"db"
+"dcc"
+"acb"
+"cdacba"
+""

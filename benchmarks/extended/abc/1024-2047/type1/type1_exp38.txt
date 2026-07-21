@@ -1,0 +1,23 @@
+Type 1, Exp 38
+++
+"acbbcbbcabbaab"
+"cbccabbcaaaba"
+"abcacabaacacb"
+"cbcacbaaaabbb"
+"cabccabaacbaac"
+"aabbabcacabacb"
+"aabcabcbbbcbab"
+"bcacaaabacab"
+"abcaacabbcccac"
+"accabbaacbccca"
+--
+"aaabcbbccaacbc"
+"bacbbcbbbccbab"
+"cbcbcbabacaabb"
+"cacbbabaaaaaab"
+"bacabbabaabaac"
+"cbbabacbacbcab"
+"ccbbabbcacbaaa"
+"acbcabaabacbb"
+"cacaaabccccccc"
+"ababaccabcc"

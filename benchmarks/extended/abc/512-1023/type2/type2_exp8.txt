@@ -1,0 +1,23 @@
+Type 2, Exp 8
+++
+"caccbacbcaccba"
+"bcac"
+"bacabaa"
+"bcacabcb"
+"acaa"
+"cccccbaaaabb"
+"abbca"
+"acabcbaacbabbac"
+"cacabcabbbabba"
+"aaaccaabcaaccaa"
+--
+"bbbaa"
+"acacab"
+"acbababccacacab"
+"abaaaa"
+"accbccccba"
+"bccbbcbc"
+"bccbbba"
+"abacb"
+"baaccccaacbba"
+"aacca"

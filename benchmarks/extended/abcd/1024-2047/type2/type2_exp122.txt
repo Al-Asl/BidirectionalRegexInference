@@ -1,0 +1,23 @@
+Type 2, Exp 122
+++
+"bbddaddcbabbdadccca"
+"dcbc"
+"bcadacc"
+"bbdccdaaacbdccaadcab"
+"cacdcbdadbaccbbbaaaccbcddab"
+"bcdcaccddaddad"
+"ccdcbbc"
+"bddcadbbdca"
+"cbacbcb"
+"cddababcbabad"
+--
+"bca"
+"cbbdbda"
+"cdddcbbababdbcccaababaac"
+"bb"
+"bcacabcdcdcaab"
+"bacaabacdaadbbbcdddcdddcc"
+"cbbacbccddabddddc"
+"c"
+"cdc"
+"dcacab"

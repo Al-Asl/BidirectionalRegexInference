@@ -1,0 +1,23 @@
+Type 1, Exp 68
+++
+"abbccbab"
+"aacbbaba"
+"aaaaccbc"
+"bccbbca"
+"bbaabccc"
+"aabbabab"
+"aabcaccb"
+"cbbaabaa"
+"cbcababb"
+"bcbcbaca"
+--
+"abbbbbab"
+"bbbbabac"
+"bbacbcab"
+"bbaabaa"
+"aabaaabc"
+"accbcaba"
+"accbbaaa"
+"cbcabbbb"
+"cbcbcbb"
+"aaccccbb"

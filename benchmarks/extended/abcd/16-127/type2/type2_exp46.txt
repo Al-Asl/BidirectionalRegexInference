@@ -1,0 +1,18 @@
+Type 2, Exp 46
+++
+"abd"
+"ddc"
+"b"
+"cbdcb"
+"daba"
+--
+"bacd"
+"ba"
+"aa"
+"ad"
+"bada"
+"accba"
+""
+"cd"
+"addb"
+"c"

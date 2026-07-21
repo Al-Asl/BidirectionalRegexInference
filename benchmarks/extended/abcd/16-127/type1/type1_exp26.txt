@@ -1,0 +1,19 @@
+Type 1, Exp 26
+++
+"baa"
+"dbbd"
+"cdc"
+"bdcc"
+"ddaa"
+"bad"
+"cbda"
+"aabd"
+--
+"dbac"
+"bbda"
+"b"
+"caad"
+"accd"
+"cddd"
+"adc"
+"baca"

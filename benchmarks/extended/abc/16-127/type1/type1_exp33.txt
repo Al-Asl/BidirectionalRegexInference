@@ -1,0 +1,19 @@
+Type 1, Exp 33
+++
+"accc"
+"cccc"
+"aaca"
+"cbc"
+"cab"
+"cabc"
+"ccbc"
+--
+"babc"
+"aaab"
+"bcab"
+"bc"
+"acab"
+"acb"
+"b"
+"bccc"
+"acaa"

@@ -1,0 +1,22 @@
+Type 1, Exp 7
+++
+"acdd"
+"bbdad"
+"dbccb"
+"aacad"
+"dddab"
+"bcabd"
+"cacab"
+--
+"dabab"
+"baaac"
+"bcbcc"
+"bdaba"
+"dada"
+"cdba"
+"bbbdd"
+"abaaa"
+"abdd"
+"caadb"
+"ccdbc"
+"ddacd"

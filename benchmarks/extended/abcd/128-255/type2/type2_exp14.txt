@@ -1,0 +1,18 @@
+Type 2, Exp 14
+++
+"adcb"
+"bacbcbbca"
+"aabbabccaa"
+"cdaacbcc"
+"cdcc"
+"ac"
+--
+"baabaa"
+"bcdcbbd"
+"bcdcbadabc"
+"aaadcbdcbc"
+"d"
+"bcad"
+"a"
+"cdcbaa"
+"bb"

@@ -1,0 +1,22 @@
+Type 1, Exp 14
+++
+"bba"
+"bbcbc"
+"bcabb"
+"cacaa"
+"bbbbb"
+"bbbb"
+"abba"
+"bacab"
+--
+"baaab"
+"acbcb"
+"cbbc"
+"baacb"
+"babcc"
+"ccabc"
+"baca"
+"abcbb"
+"abaab"
+"cbaac"
+"bcac"

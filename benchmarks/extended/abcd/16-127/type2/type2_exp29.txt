@@ -1,0 +1,20 @@
+Type 2, Exp 29
+++
+"cccd"
+"a"
+"ba"
+"bc"
+"b"
+"ad"
+--
+"abbd"
+"abc"
+"bcdd"
+"dbc"
+"bcad"
+"c"
+"bb"
+""
+"bdaa"
+"cdd"
+"ddcb"

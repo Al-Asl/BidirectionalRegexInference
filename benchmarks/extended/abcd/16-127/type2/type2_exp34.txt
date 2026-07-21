@@ -1,0 +1,23 @@
+Type 2, Exp 34
+++
+"aaccd"
+"bdb"
+"dbbbb"
+"bada"
+"dd"
+"dcc"
+"ca"
+"ba"
+"aa"
+--
+""
+"addcd"
+"bac"
+"accc"
+"dacbd"
+"bbac"
+"d"
+"a"
+"aca"
+"cda"
+"b"

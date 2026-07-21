@@ -1,0 +1,22 @@
+Type 2, Exp 20
+++
+"caaaccbabcbcc"
+"bbaccdcacdbdd"
+"bacacabb"
+"cbbbabcdddc"
+"bbdddaaacddcb"
+"abcabcdacccdd"
+"cdbdc"
+"cbdcaccccac"
+"acdadbbda"
+--
+"caacacbca"
+"bbdadcaaccca"
+"aac"
+"ccababcacc"
+""
+"cddbacdbbacac"
+"adcac"
+"d"
+"ad"
+"adcaadcbbcddd"

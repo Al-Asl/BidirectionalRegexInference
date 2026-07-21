@@ -1,0 +1,16 @@
+Type 1, Exp 24
+++
+"dabcdc"
+"dccbabc"
+"cccbcccb"
+"caacacbb"
+"cddcccc"
+"acbacddc"
+"abbabcbb"
+"daccddca"
+--
+"aaadbbdc"
+"abcccada"
+"bbdcbb"
+"ccdbdbdd"
+"adbdadb"
